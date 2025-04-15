@@ -1,4 +1,5 @@
 <template>
+
   <div class="p-4 sm:p-8 max-w-7xl mx-auto bg-white shadow-md rounded-xl">
     <h2 class="text-2xl sm:text-3xl font-semibold text-center text-gray-800 mb-6">Customer Management</h2>
 
