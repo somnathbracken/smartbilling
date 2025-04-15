@@ -6,6 +6,7 @@
       <input v-model="customer.name" placeholder="Name" />
       <input v-model="customer.email" placeholder="Email" />
       <input v-model="customer.phone" placeholder="Phone" />
+      <input v-model="customer.address" placeholder="Address" />
       <button @click="saveCustomer">{{ customer.id ? 'Update' : 'Save' }}</button>
       <button @click="resetForm">Reset</button>
       <input v-model="search" @input="searchCustomers" placeholder="Search by any field..." />
@@ -17,16 +18,18 @@
           <th>Name</th>
           <th>Email</th>
           <th>Phone</th>
+          <th>Address</th>
           <th>Actions</th>
         </tr>
       </thead>
       <tbody>
-        <tr v-for="c in customers" :key="c.id">
+        <tr v-for="(c, index) in customers" :key="c.id">
           <td><input v-model="c.name" /></td>
           <td><input v-model="c.email" /></td>
           <td><input v-model="c.phone" /></td>
+          <td><input v-model="c.address" /></td>
           <td>            
-            <button @click="updateCustomer(c)">Save</button>
+            <button @click="updateCustomer(c)">Update</button>
             <button @click="deleteCustomer(c.id)">Delete</button>
           </td>
         </tr>
@@ -40,7 +43,7 @@ import { ref, onMounted } from 'vue'
 import CustomerService from '../services/CustomerService'
 
 const customers = ref([])
-const customer = ref({ name: '', email: '', city: '' })
+const customer = ref({ name: '', email: '', phone: '', address: '' })
 const search = ref('')
 
 const loadCustomers = async () => {
@@ -70,14 +73,21 @@ const editCustomer = (c) => {
   customer.value = { ...c }
 }
 
-const updateCustomer = async (c) => {
-  try {
-    await CustomerService.update(c.id, c)
-    loadCustomers()
-  } catch (err) {
-    console.error('Error updating customer:', err)
+const updateCustomer = async (customer) => {
+  if (!customer.id) {
+    alert("Customer ID is missing. Cannot update.");
+    return;
   }
-}
+
+  try {
+    await CustomerService.update(customer.id, customer);
+    alert('Customer updated successfully.');
+    fetchCustomers();
+  } catch (error) {
+    console.error('Error updating customer:', error);
+    //alert('Update failed.');
+  }
+};
 
 const deleteCustomer = async (id) => {
   try {
@@ -89,7 +99,7 @@ const deleteCustomer = async (id) => {
 }
 
 const resetForm = () => {
-  customer.value = { name: '', email: '', city: '' }
+  customer.value = { name: '', email: '', phone: '', address: '' }
 }
 
 const searchCustomers = async () => {

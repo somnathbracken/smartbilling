@@ -41,6 +41,7 @@ public class CustomerController {
                 c.setName(customer.getName());
                 c.setEmail(customer.getEmail());
                 c.setPhone(customer.getPhone());
+                c.setAddress(customer.getAddress());
                 return customerRepository.save(c);
             }).orElseThrow(() -> new RuntimeException("Customer not found"));
     }
@@ -52,6 +53,6 @@ public class CustomerController {
 
     @GetMapping("/search")
     public List<Customer> searchCustomers(@RequestParam String keyword) {
-        return customerRepository.findByNameContainingIgnoreCaseOrEmailContainingIgnoreCaseOrPhoneContainingIgnoreCase(keyword, keyword, keyword);
+        return customerRepository.findByNameContainingIgnoreCaseOrEmailContainingIgnoreCaseOrPhoneContainingIgnoreCaseOrAddressContainingIgnoreCase(keyword, keyword, keyword, keyword);
     }
 }

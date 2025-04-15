@@ -14,8 +14,8 @@ export default {
   create(data) {
     return axios.post(API_URL, data)
   },
-  update(id, data) {
-    return axios.put(`${API_URL}/${id}`, data)
+  update(id, customer) {
+    return axios.put(`${API_URL}/${id}`, customer);
   },
   remove(id) {
     return axios.delete(`${API_URL}/${id}`)
