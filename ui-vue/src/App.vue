@@ -1,8 +1,7 @@
-
 <template>
-  <CustomerGrid />
+  <MainLayout />
 </template>
 
 <script setup>
-import CustomerGrid from './components/CustomerGrid.vue'
+import MainLayout from './layouts/MainLayout.vue'
 </script>
