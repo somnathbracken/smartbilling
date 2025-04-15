@@ -1,10 +1,11 @@
 package com.smartbill.customerservice.service;
 
-import com.smartbill.customerservice.model.Customer;
-import com.smartbill.customerservice.repository.CustomerRepository;
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import com.smartbill.customerservice.model.Customer;
+import com.smartbill.customerservice.repository.CustomerRepository;
 
 @Service
 public class CustomerServiceImpl implements CustomerService {
@@ -25,10 +26,6 @@ public class CustomerServiceImpl implements CustomerService {
         return repository.findById(id).orElse(null);
     }
 
-    @Override
-    public Customer getByName(String name) {
-        return repository.findByName(name).orElse(null);
-    }
     
     @Override
     public Customer save(Customer customer) {
@@ -39,4 +36,10 @@ public class CustomerServiceImpl implements CustomerService {
     public void delete(Long id) {
         repository.deleteById(id);
     }
+
+	@Override
+	public Customer getByName(String name) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

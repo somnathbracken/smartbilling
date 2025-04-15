@@ -1,44 +1,57 @@
 package com.smartbill.customerservice.controller;
 
-import com.smartbill.customerservice.model.Customer;
-import com.smartbill.customerservice.service.CustomerService;
-import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.smartbill.customerservice.model.Customer;
+import com.smartbill.customerservice.repository.CustomerRepository;
 
 @RestController
 @RequestMapping("/api/customers")
 @CrossOrigin(origins = "*")
 public class CustomerController {
-
-    private final CustomerService service;
-
-    public CustomerController(CustomerService service) {
-        this.service = service;
-    }
+    @Autowired
+    private CustomerRepository customerRepository;
 
     @GetMapping("/listAll")
-    public List<Customer> getAll() {
-        return service.getAll();
-    }
-
-    @GetMapping("/{id}")
-    public Customer get(@PathVariable Long id) {
-        return service.getById(id);
-    }
-    
-    @GetMapping("/name/{name}")
-    public Customer getByName(@PathVariable String name) {
-        return service.getByName(name);
+    public List<Customer> getAllCustomers() {
+        return customerRepository.findAll();
     }
 
     @PostMapping
-    public Customer save(@RequestBody Customer customer) {
-        return service.save(customer);
+    public Customer createCustomer(@RequestBody Customer customer) {
+        return customerRepository.save(customer);
+    }
+
+    @PutMapping("/{id}")
+    public Customer updateCustomer(@PathVariable Long id, @RequestBody Customer customer) {
+        return customerRepository.findById(id)
+            .map(c -> {
+                c.setName(customer.getName());
+                c.setEmail(customer.getEmail());
+                c.setPhone(customer.getPhone());
+                return customerRepository.save(c);
+            }).orElseThrow(() -> new RuntimeException("Customer not found"));
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
-        service.delete(id);
+    public void deleteCustomer(@PathVariable Long id) {
+        customerRepository.deleteById(id);
+    }
+
+    @GetMapping("/search")
+    public List<Customer> searchCustomers(@RequestParam String keyword) {
+        return customerRepository.findByNameContainingIgnoreCaseOrEmailContainingIgnoreCaseOrPhoneContainingIgnoreCase(keyword, keyword, keyword);
     }
 }

@@ -2,16 +2,13 @@
   <div class="container">
     <h2>Customer Management</h2>
 
-    <form @submit.prevent="saveCustomer">
-      <input v-model="customer.name" placeholder="Name" required />
-      <input v-model="customer.email" placeholder="Email" required />
-      <input v-model="customer.phone" placeholder="Phone" required />
-      <button type="submit">Save</button>
-    </form>
-
-    <div class="search">
-      <input v-model="searchTerm" placeholder="Search by name" />
-      <button @click="searchCustomers">Search</button>
+    <div class="form">
+      <input v-model="customer.name" placeholder="Name" />
+      <input v-model="customer.email" placeholder="Email" />
+      <input v-model="customer.phone" placeholder="Phone" />
+      <button @click="saveCustomer">{{ customer.id ? 'Update' : 'Save' }}</button>
+      <button @click="resetForm">Reset</button>
+      <input v-model="search" @input="searchCustomers" placeholder="Search by any field..." />
     </div>
 
     <table>
@@ -24,13 +21,13 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(cust, index) in customers" :key="cust.id">
-          <td><input v-model="cust.name" /></td>
-          <td><input v-model="cust.email" /></td>
-          <td><input v-model="cust.phone" /></td>
-          <td>
-            <button @click="updateCustomer(cust)">Update</button>
-            <button @click="deleteCustomer(cust.id)">Delete</button>
+        <tr v-for="c in customers" :key="c.id">
+          <td><input v-model="c.name" /></td>
+          <td><input v-model="c.email" /></td>
+          <td><input v-model="c.phone" /></td>
+          <td>            
+            <button @click="updateCustomer(c)">Save</button>
+            <button @click="deleteCustomer(c.id)">Delete</button>
           </td>
         </tr>
       </tbody>
@@ -42,77 +39,106 @@
 import { ref, onMounted } from 'vue'
 import CustomerService from '../services/CustomerService'
 
-const customer = ref({ name: '', email: '', phone: '' })
 const customers = ref([])
-const searchTerm = ref('')
+const customer = ref({ name: '', email: '', city: '' })
+const search = ref('')
 
-const fetchCustomers = async () => {
-  customers.value = await CustomerService.getAllCustomers()
-}
-
-const saveCustomer = async () => {
-  await CustomerService.saveCustomer(customer.value)
-  customer.value = { name: '', email: '', phone: '' }
-  await fetchCustomers()
-}
-
-const updateCustomer = async (cust) => {
-  await CustomerService.updateCustomer(cust)
-  await fetchCustomers()
-}
-
-const deleteCustomer = async (id) => {
-  await CustomerService.deleteCustomer(id)
-  await fetchCustomers()
-}
-
-const searchCustomers = async () => {
-  if (searchTerm.value.trim() === '') {
-    await fetchCustomers()
-  } else {
-    customers.value = await CustomerService.searchCustomers(searchTerm.value)
+const loadCustomers = async () => {
+  try {
+    const res = await CustomerService.getAll()
+    customers.value = res.data
+  } catch (err) {
+    console.error('Error loading customers:', err)
   }
 }
 
-onMounted(fetchCustomers)
+const saveCustomer = async () => {
+  try {
+    if (customer.value.id) {
+      await CustomerService.update(customer.value.id, customer.value)
+    } else {
+      await CustomerService.create(customer.value)
+    }
+    resetForm()
+    loadCustomers()
+  } catch (err) {
+    console.error('Error saving customer:', err)
+  }
+}
+
+const editCustomer = (c) => {
+  customer.value = { ...c }
+}
+
+const updateCustomer = async (c) => {
+  try {
+    await CustomerService.update(c.id, c)
+    loadCustomers()
+  } catch (err) {
+    console.error('Error updating customer:', err)
+  }
+}
+
+const deleteCustomer = async (id) => {
+  try {
+    await CustomerService.remove(id)
+    loadCustomers()
+  } catch (err) {
+    console.error('Error deleting customer:', err)
+  }
+}
+
+const resetForm = () => {
+  customer.value = { name: '', email: '', city: '' }
+}
+
+const searchCustomers = async () => {
+  try {
+    if (!search.value.trim()) return loadCustomers()
+    const res = await CustomerService.search(search.value)
+    customers.value = res.data
+  } catch (err) {
+    console.error('Search error:', err)
+  }
+}
+
+onMounted(() => {
+  loadCustomers()
+})
 </script>
 
 <style scoped>
 .container {
   padding: 20px;
+  max-width: 900px;
+  margin: auto;
   font-family: Arial, sans-serif;
 }
-
+.form {
+  margin-bottom: 20px;
+}
 input {
   margin: 5px;
   padding: 6px;
-  border-radius: 4px;
-  border: 1px solid #ccc;
+  width: 180px;
 }
-
 button {
   margin: 5px;
-  padding: 6px 12px;
-  border: none;
-  background-color: #007acc;
+  padding: 6px 10px;
+  background-color: #007bff;
   color: white;
+  border: none;
   border-radius: 4px;
-  cursor: pointer;
 }
-
 button:hover {
-  background-color: #005fa3;
+  background-color: #0056b3;
 }
-
 table {
   width: 100%;
-  margin-top: 20px;
   border-collapse: collapse;
 }
-
-th,
-td {
-  padding: 10px;
-  border: 1px solid #ddd;
+th, td {
+  border: 1px solid #ccc;
+  padding: 8px;
 }
 </style>

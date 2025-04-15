@@ -1,21 +1,26 @@
+// src/services/CustomerService.js
+
 import axios from 'axios'
 
 const API_URL = 'http://localhost:8080/api/customers'
 
 export default {
-  getAllCustomers() {
-    return axios.get(API_URL+"/listAll").then(res => res.data)
+  getAll() {
+    return axios.get(API_URL+"/listAll")
   },
-  saveCustomer(customer) {
-    return axios.post(API_URL, customer)
+  get(id) {
+    return axios.get(`${API_URL}/${id}`)
   },
-  updateCustomer(customer) {
-    return axios.put(`${API_URL}/${customer.id}`, customer)
+  create(data) {
+    return axios.post(API_URL, data)
   },
-  deleteCustomer(id) {
+  update(id, data) {
+    return axios.put(`${API_URL}/${id}`, data)
+  },
+  remove(id) {
     return axios.delete(`${API_URL}/${id}`)
   },
-  searchCustomers(name) {
-    return axios.get(`${API_URL}/name/${name}`).then(res => res.data)
+  search(keyword) {
+    return axios.get(`${API_URL}/search?keyword=${encodeURIComponent(keyword)}`)
   }
 }
