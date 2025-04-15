@@ -55,4 +55,5 @@ public class CustomerController {
     public List<Customer> searchCustomers(@RequestParam String keyword) {
         return customerRepository.findByNameContainingIgnoreCaseOrEmailContainingIgnoreCaseOrPhoneContainingIgnoreCaseOrAddressContainingIgnoreCase(keyword, keyword, keyword, keyword);
     }
+    
 }
