@@ -101,7 +101,11 @@
 <div class="col-span-4 text-lg font-semibold mt-4 mb-2">Pricing & SKU</div>
 <div>
   <label>Price</label>
-  <input v-model="product.product_price" class="input" type="number" step="0.01" />
+  <input v-model="product.product_purchase_price" class="input" type="number" step="0.01" />
+</div>
+<div>
+  <label>MRP</label>
+  <input v-model="product.product_mrp" class="input" type="number" step="0.01" />
 </div>
 <div>
   <label>Pack Size</label>
@@ -121,6 +125,10 @@
 <div>
   <label>HSN Code</label>
   <input v-model="product.hsn_code" class="input" type="text" />
+</div>
+<div>
+  <label>HSN Description</label>
+  <input v-model="product.hsn_description" class="input" type="text" />
 </div>
 <div>
   <label>Model/Part ID</label>
@@ -173,6 +181,13 @@
     <option value="">Select Attribute</option>
     <option v-for="attr in productAttributes" :key="attr.id" :value="attr.id">{{ attr.name }}</option>
   </select>
+</div>
+
+<!-- Discounts -->
+<div class="col-span-4 text-lg font-semibold mt-4 mb-2">Discounts</div>
+<div>
+  <label>Discounts(%)</label>
+  <input v-model="product.product_discounts" class="input" type="number" step="0.01" />
 </div>
 
 <!-- Flags & Status -->
