@@ -26,7 +26,7 @@
   </div>
 </div>
 <div>
-  <label>Stock</label>
+  <label>Stock Location</label>
   <div class="flex space-x-2 items-center">
     <select v-model="product.stock_id" class="input">
       <option v-for="stock in stocks" :key="stock.id" :value="stock.id">{{ stock.name }}</option>
