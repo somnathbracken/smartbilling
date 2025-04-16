@@ -13,4 +13,5 @@ npm install -D tailwindcss@3 @tailwindcss/postcss postcss
 npx tailwindcss init -p
 npm install vue-router@4
 npm install -D tailwindcss postcss autoprefixer
+npm install lucide-vue-next
 npm run dev

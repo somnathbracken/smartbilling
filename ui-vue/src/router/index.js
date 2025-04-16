@@ -1,12 +1,9 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import CustomerGrid from '../views/CustomerGrid.vue'
+import { createRouter, createWebHistory } from 'vue-router';
+import ProductView from '../views/ProductView.vue';
 
 const routes = [
-  { path: '/', redirect: '/customers' },
-  { path: '/customers', component: CustomerGrid },
-]
+  { path: '/', name: 'Product', component: ProductView },
+];
 
-export default createRouter({
-  history: createWebHistory(),
-  routes,
-})
+const router = createRouter({ history: createWebHistory(), routes });
+export default router;
