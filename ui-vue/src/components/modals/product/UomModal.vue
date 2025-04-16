@@ -1,71 +1,41 @@
 <template>
-    <div v-if="isOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-      <div class="bg-white p-6 rounded-xl shadow-xl w-full max-w-md">
-        <div class="flex justify-between items-center mb-4">
-          <h2 class="text-xl font-semibold">Add Unit of Measure</h2>
-          <button @click="closeModal" class="text-gray-500 hover:text-red-600 text-lg">&times;</button>
+  <div v-if="show" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+    <div class="bg-white p-6 rounded shadow-md w-full max-w-md">
+      <h2 class="text-lg font-semibold mb-4">Add New UOM</h2>
+      <form @submit.prevent="addItem">
+        <div class="mb-3">
+          <label class="block mb-1 font-medium">UOM Name</label>
+          <input v-model="item.name" type="text" class="input w-full" required />
         </div>
-  
-        <form @submit.prevent="submitForm">
-          <div class="space-y-4">
-            <!-- UOM Name -->
-            <div>
-              <label class="block text-sm font-medium mb-1">UOM Name</label>
-              <input
-                v-model="uom.uom_name"
-                type="text"
-                class="w-full border px-3 py-2 rounded"
-                placeholder="Enter UOM name (e.g., kg, pcs)"
-                required
-              />
-            </div>
-          </div>
-  
-          <div class="flex justify-end gap-2 mt-6">
-            <button
-              type="button"
-              @click="closeModal"
-              class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded"
-            >
-              Save
-            </button>
-          </div>
-        </form>
-      </div>
+        <div class="flex justify-end space-x-2">
+          <button type="button" class="btn bg-gray-300 px-3 py-1" @click="$emit('close')">Cancel</button>
+          <button type="submit" class="btn bg-blue-600 text-white px-3 py-1">Add</button>
+        </div>
+      </form>
     </div>
-  </template>
-  
-  <script setup>
-  import { ref } from 'vue'
-  
-  const props = defineProps({
-    isOpen: Boolean
-  })
-  
-  const emit = defineEmits(['close', 'save'])
-  
-  const uom = ref({
-    uom_name: ''
-  })
-  
-  const closeModal = () => {
-    emit('close')
-  }
-  
-  const submitForm = () => {
-    if (uom.value.uom_name.trim() !== '') {
-      emit('save', { ...uom.value })
-      uom.value.uom_name = ''
-      closeModal()
-    } else {
-      alert('Please enter a UOM name.')
-    }
-  }
-  </script>
-  
+  </div>
+</template>
+
+<script setup>
+import { ref, defineProps, defineEmits } from 'vue'
+
+const props = defineProps({ show: Boolean })
+const emit = defineEmits(['close', 'added'])
+
+const item = ref({ id: null, name: '' })
+
+function addItem() {
+  item.value.id = Date.now()
+  emit('added', { ...item.value })
+  emit('close')
+  item.value = { id: null, name: '' }
+}
+</script>
+
+<style scoped>
+.input {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 0.5rem;
+}
+</style>
