@@ -1,0 +1,215 @@
+-- vendor
+CREATE TABLE vendor (
+  id bigint NOT NULL AUTO_INCREMENT,
+  address varchar(255) DEFAULT NULL,
+  email varchar(255) DEFAULT NULL,
+  name varchar(255) DEFAULT NULL,
+  phone varchar(255) DEFAULT NULL,
+  PRIMARY KEY (id)
+);
+
+-- customer
+CREATE TABLE customer (
+  id bigint NOT NULL AUTO_INCREMENT,
+  name varchar(255) DEFAULT NULL,
+  email varchar(255) DEFAULT NULL,
+  phone varchar(255) DEFAULT NULL,
+  address varchar(255) DEFAULT NULL,
+  PRIMARY KEY (id)
+);
+
+-- Sites
+CREATE TABLE Sites (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    site_code VARCHAR(50) NOT NULL,
+    site_name VARCHAR(100) NOT NULL
+);
+
+-- Warehouse
+CREATE TABLE Warehouse (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    site_id INT,
+    warehouse_code VARCHAR(50) NOT NULL,
+    warehouse_name VARCHAR(100) NOT NULL,
+    FOREIGN KEY (site_id) REFERENCES Sites(id)
+);
+
+-- Item Category
+CREATE TABLE ItemCategory (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    category_code VARCHAR(50),
+    category_name VARCHAR(100)
+);
+
+-- Item Group
+CREATE TABLE ItemGroup (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    group_code VARCHAR(50),
+    group_name VARCHAR(100)
+);
+
+-- Generic Product
+CREATE TABLE GenericProduct (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    generic_name VARCHAR(100)
+);
+
+-- Brand Manufacturer
+CREATE TABLE BrandManufacturer (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    manufacturer_name VARCHAR(100)
+);
+
+-- Brand
+CREATE TABLE Brand (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    manufacturer_id INT,
+    brand_code VARCHAR(50),
+    brand_name VARCHAR(100),
+    FOREIGN KEY (manufacturer_id) REFERENCES BrandManufacturer(id)
+);
+
+-- Product Attribute Type
+CREATE TABLE ProductAttributeType (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    attribute_name VARCHAR(100)
+);
+
+-- Product
+CREATE TABLE Product (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    product_code VARCHAR(100),
+    hsn_code VARCHAR(50),
+    category_id INT,
+    group_id INT,
+    brand_id INT,
+    generic_id INT,
+    model_id INT,
+    product_name VARCHAR(200),
+    product_description TEXT,
+    product_price DECIMAL(10,2),
+    has_instances CHAR(1),
+    has_lots CHAR(1),
+    has_attributes CHAR(1),
+    default_uom VARCHAR(50),
+    pack_size VARCHAR(50),
+    average_cost DECIMAL(10,2),
+    single_unit_product_code VARCHAR(100),
+    dimension_group VARCHAR(100),
+    lot_information TEXT,
+    warranty_terms TEXT,
+    is_active BOOLEAN DEFAULT TRUE,
+    deleted BOOLEAN DEFAULT FALSE,
+    FOREIGN KEY (category_id) REFERENCES ItemCategory(id),
+    FOREIGN KEY (group_id) REFERENCES ItemGroup(id),
+    FOREIGN KEY (brand_id) REFERENCES Brand(id),
+    FOREIGN KEY (generic_id) REFERENCES GenericProduct(id)
+);
+
+-- Product Attribute
+CREATE TABLE ProductAttribute (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    product_id INT,
+    attribute_id INT,
+    FOREIGN KEY (product_id) REFERENCES Product(id),
+    FOREIGN KEY (attribute_id) REFERENCES ProductAttributeType(id)
+);
+
+-- Product Attribute Value
+CREATE TABLE ProductAttributeValue (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    product_attribute_id INT,
+    value VARCHAR(100),
+    FOREIGN KEY (product_attribute_id) REFERENCES ProductAttribute(id)
+);
+
+-- Product Instance
+CREATE TABLE ProductInstance (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    product_id INT,
+    instance_name VARCHAR(100),
+    serial_number VARCHAR(100),
+    brand_id INT,
+    stock_id INT,
+    lot_information TEXT,
+    warranty_terms TEXT,
+    product_attribute_value_id INT,
+    FOREIGN KEY (product_id) REFERENCES Product(id),
+    FOREIGN KEY (brand_id) REFERENCES Brand(id),
+    FOREIGN KEY (product_attribute_value_id) REFERENCES ProductAttributeValue(id)
+);
+
+-- Product Lot
+CREATE TABLE ProductLot (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    lot_code VARCHAR(100),
+    date_manufactured DATE,
+    date_expiry DATE,
+    product_attribute_value_id INT,
+    FOREIGN KEY (product_attribute_value_id) REFERENCES ProductAttributeValue(id)
+);
+
+-- Stock
+CREATE TABLE Stock (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    product_id INT,
+    warehouse_id INT,
+    quantity_in_hand DECIMAL(10,2),
+    product_attribute_value_id INT,
+    FOREIGN KEY (product_id) REFERENCES Product(id),
+    FOREIGN KEY (warehouse_id) REFERENCES Warehouse(id),
+    FOREIGN KEY (product_attribute_value_id) REFERENCES ProductAttributeValue(id)
+);
+
+-- Product Price Records
+CREATE TABLE ProductPriceRecords (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    product_id INT,
+    from_date DATE,
+    product_price DECIMAL(10,2),
+    FOREIGN KEY (product_id) REFERENCES Product(id)
+);
+
+-- Vendor
+CREATE TABLE Vendor (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    vendor_code VARCHAR(50),
+    vendor_name VARCHAR(100),
+    vendor_type VARCHAR(100)
+);
+
+-- Product UOM
+CREATE TABLE ProductUOM (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    uom_name VARCHAR(50)
+);
+
+-- Product UOM Conversion
+CREATE TABLE ProductUOMConversion (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    from_uom_id INT,
+    to_uom_id INT,
+    conversion_rule VARCHAR(100),
+    FOREIGN KEY (from_uom_id) REFERENCES ProductUOM(id),
+    FOREIGN KEY (to_uom_id) REFERENCES ProductUOM(id)
+);
+
+-- Purchase Order Header
+CREATE TABLE PurchaseOrderHeader (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    supplier_id INT,
+    purchase_date DATE,
+    total_amount DECIMAL(10,2),
+    FOREIGN KEY (supplier_id) REFERENCES Vendor(id)
+);
+
+-- Purchase Order Line
+CREATE TABLE PurchaseOrderLine (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    po_id INT,
+    product_id INT,
+    unit_price DECIMAL(10,2),
+    quantity DECIMAL(10,2),
+    FOREIGN KEY (po_id) REFERENCES PurchaseOrderHeader(id),
+    FOREIGN KEY (product_id) REFERENCES Product(id)
+);

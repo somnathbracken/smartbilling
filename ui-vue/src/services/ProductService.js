@@ -1,16 +1,17 @@
-export default {
-  async getCategories() {
-    return [
-      { id: 1, name: 'Electronics' },
-      { id: 2, name: 'Groceries' }
-    ]
-  },
-  async addCategory(category) {
-    const newId = Math.floor(Math.random() * 1000) + 3
-    return { id: newId, name: category.name }
-  },
-  async saveProduct(product) {
-    console.log("Saving product:", product)
-    return { success: true }
-  }
+export async function fetchAllProducts() {
+  return [
+    { id: 1, name: 'Product A', sku: 'A100', unit_price: 100, quantity: 10, status: 'active' },
+    { id: 2, name: 'Product B', sku: 'B200', unit_price: 200, quantity: 5, status: 'inactive' }
+  ]
+}
+
+export async function saveProductData(product) {
+  console.log('Saving', product)
+}
+
+export async function fetchCategories() {
+  return [
+    { id: 1, name: 'Electronics' },
+    { id: 2, name: 'Apparel' }
+  ]
 }
