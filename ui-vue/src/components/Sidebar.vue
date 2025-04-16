@@ -17,10 +17,8 @@ const menuItems = [
   { name: 'Vendors', route: '/vendors' },
   { name: 'Products', route: '/products' },
   { name: 'Stocks', route: '/stocks' },
-  { name: 'Purchase', route: '/purchase' },
-  { name: 'Sale', route: '/sale' },
-  { name: 'Purchase Invoice', route: '/purchase-invoice' },
-  { name: 'Sales Invoice', route: '/sales-invoice' },
+  { name: 'Purchase Order', route: '/purchase' },
+  { name: 'Sales Invoice', route: '/sale' },
   { name: 'Reports', route: '/reports' },
   { name: 'Logout', route: '/logout' }
 ];

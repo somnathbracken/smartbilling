@@ -162,10 +162,17 @@
 <!-- Associations -->
 <div class="col-span-4 text-lg font-semibold mt-4 mb-2">Associations</div>
 <div>
-  <label>Supplier</label>
+  <!-- <label>Supplier</label>
   <select v-model="product.supplierId" class="input">
     <option value="">Select Supplier</option>
     <option v-for="supplier in suppliers" :key="supplier.id" :value="supplier.id">{{ supplier.name }}</option>
+  </select> -->
+  <label for="vendor">Vendor</label>
+  <select v-model="selectedVendor" class="form-select border p-2 rounded w-full">
+    <option disabled value="">Select Vendor</option>
+    <option v-for="vendor in vendors" :key="vendor.id" :value="vendor.id">
+      {{ vendor.name }}
+    </option>
   </select>
 </div>
 <div>
@@ -270,7 +277,9 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import axios from 'axios'
+
 import CategoryModal from '../components/modals/product/CategoryModal.vue'
 import GroupModal from '../components/modals/product/GroupModal.vue'
 import BrandModal from '../components/modals/product/BrandModal.vue'
@@ -369,6 +378,19 @@ function saveProduct() {
   console.log('Saving product:', product.value)
   alert('Product saved!')
 }
+
+// load dropdowns
+
+const vendors = ref([])
+
+onMounted(async () => {
+  try {
+    const response = await axios.get('http://localhost:8081/api/vendors/listAll')
+    vendors.value = response.data
+  } catch (error) {
+    console.error('Error fetching vendors:', error)
+  }
+})
 </script>
 
 <style scoped>
