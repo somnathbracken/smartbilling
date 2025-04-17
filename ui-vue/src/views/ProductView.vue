@@ -231,48 +231,99 @@
 
 
     <!-- Modals -->
-    <GenericProductModal :isOpen="showGenericModal" @close="showGenericModal = false" @save="handleGenericSaved" />
-    <CategoryModal :show="showCategoryModal" @close="showCategoryModal = false" @saved="handleCategorySaved" />
+    <!-- <SiteModal
+      :show="showSiteModal"
+      @close="showSiteModal = false"
+      @added="() => {
+        getAllSites()
+          .then(response => {
+            sites.value = response.data;
+            const lastSite = sites.value[sites.value.length - 1];
+            if (lastSite) {
+              product.site_id = lastSite.id;
+            }
+          })
+          .catch(error => {
+            console.error('Error fetching updated sites:', error);
+          });
+      }"
+    />
+
+    <StockModal
+      :show="showStockModal"
+      @close="showStockModal = false"
+      @added="() => {
+        getAllStocks()
+          .then(response => {
+            stocks.value = response.data;
+            const lastStock = stocks.value[stocks.value.length - 1];
+            if (lastStock) {
+              product.stock_id = lastStock.id;
+            }
+          })
+          .catch(error => {
+            console.error('Error fetching updated Stocks:', error);
+          });
+      }"
+    />
+
+<StockModal
+  :show="showWarehouseModal"
+  @close="showWarehouseModal = false"
+  @added="() => {
+    getAllWarehouses()
+      .then(response => {
+        warehouses.value = response.data;
+        const lastWarehouse = warehouses.value[warehouses.value.length - 1];
+        if (lastWarehouse) {
+          product.warehouse_id = lastWarehouse.id;
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching warehouse:', error);
+      });
+  }"
+/>
+<UomModal
+  :show="showUomModal"
+  @close="showUomModal = false"
+  @added="() => {
+    getAllUoms()
+      .then(response => {
+        uoms.value = response.data;
+        const lastUoms = warehouses.value[uoms.value.length - 1];
+        if (lastUoms) {
+          product.uom_id = lastUoms.id;
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching UOM:', error);
+      });
+  }"
+/>
+<CategoryModal
+  :show="showCategoryModal"
+  @close="showCategoryModal = false"
+  @added="() => {
+    getAllCategories()
+      .then(response => {
+        categories.value = response.data;
+        const lastCategories = categories.value[categories.value.length - 1];
+        if (lastUoms) {
+          product.category_id = lastCategories.id;
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching UOM:', error);
+      });
+  }"
+/>
+    <GenericProductModal :isOpen="showGenericModal" @close="showGenericModal = false" @save="handleGenericSaved" />    
     <GroupModal :show="showGroupModal" @close="showGroupModal = false" @saved="handleGroupSaved" />
     <BrandModal :show="showBrandModal" @close="showBrandModal = false" @saved="handleBrandSaved" />
     <GstTaxModal :show="showGstModal" @close="showGstModal = false" @saved="handleGSTTaxSaved"/>
     <ProductLotModal :show="showLotModal" :productAttributes="productAttributes" @close="showLotModal = false" @saved="handleLotSaved"/>
-    <SiteModal
-  :show="showSiteModal"
-  @close="showSiteModal = false"
-  @added="site => {
-    sites.value.push(site)
-    product.site_id = site.id
-  }"
-/>
-
-<StockModal
-  :show="showStockModal"
-  @close="showStockModal = false"
-  @added="stock => {
-    stocks.value.push(stock)
-    product.stock_id = stock.id
-  }"
-/>
-
-<WarehouseModal
-  :show="showWarehouseModal"
-  @close="showWarehouseModal = false"
-  @added="warehouse => {
-    warehouses.value.push(warehouse)
-    product.warehouse_id = warehouse.id
-  }"
-/>
-
-<UomModal
-  :show="showUomModal"
-  @close="showUomModal = false"
-  @added="uom => {
-    uoms.value.push(uom)
-    product.default_uom = uom.id
-  }"
-/>
-
+     -->
   </div>
 </template>
 
@@ -292,28 +343,30 @@ import StockModal from '../components/modals/product/StockModal.vue'
 import WarehouseModal from '../components/modals/product/WarehouseModal.vue'
 import UomModal from '../components/modals/product/UomModal.vue'
 
+import { getAllCategories, getAllGroups, getAllSites, getAllStocks, getAllUoms, getAllWarehouses } from '../services/ProductService';
+
 const showSiteModal = ref(false)
 const showStockModal = ref(false)
 const showWarehouseModal = ref(false)
 const showUomModal = ref(false)
 
-const sites = ref([{ id: 1, name: 'Site A' }])
-const stocks = ref([{ id: 1, name: 'Stock Room 1' }])
-const warehouses = ref([{ id: 1, name: 'Warehouse Alpha' }])
-const uoms = ref([{ id: 1, name: 'Piece' }])
+//const sites = ref([{ id: 1, name: 'Site A' }])
+//const stocks = ref([{ id: 1, name: 'Stock Room 1' }])
+// const warehouses = ref([{ id: 1, name: 'Warehouse Alpha' }])
+//const uoms = ref([{ id: 1, name: 'Piece' }])
 
-const showLotModal = ref(false)
-const productLots = ref([
-  { id: 1, lot_code: 'LOT001', date_manufactured: '2024-01-01', date_expiry: '2025-01-01', product_attribute_value_id: '' }
-])
+// const showLotModal = ref(false)
+// const productLots = ref([
+//   { id: 1, lot_code: 'LOT001', date_manufactured: '2024-01-01', date_expiry: '2025-01-01', product_attribute_value_id: '' }
+// ])
 
-const productAttributes = ref([
-  { id: 'a1', name: 'Color: Red' },
-  { id: 'a2', name: 'Size: Medium' }
-])
+// const productAttributes = ref([
+//   { id: 'a1', name: 'Color: Red' },
+//   { id: 'a2', name: 'Size: Medium' }
+// ])
 
-const showGstModal = ref(false)
-const gstTaxes = ref([{ id: 1, name: 'GST 18%', percentage: 18 }]) // sample list
+// const showGstModal = ref(false)
+// const gstTaxes = ref([{ id: 1, name: 'GST 18%', percentage: 18 }]) // sample list
 
 const product = ref({
   product_code: '',
@@ -341,17 +394,107 @@ const product = ref({
   deleted: false
 })
 
-const categories = ref([{ id: 1, name: 'Electronics' }])
-const groups = ref([{ id: 1, name: 'Group A' }])
-const brands = ref([{ id: 1, name: 'Brand X' }])
-const generics = ref([{ id: 1, name: 'Generic Y' }])
-const suppliers = ref([])
+//const categories = ref([{ id: 1, name: 'Electronics' }])
+// const groups = ref([{ id: 1, name: 'Group A' }])
+// const brands = ref([{ id: 1, name: 'Brand X' }])
+// const generics = ref([{ id: 1, name: 'Generic Y' }])
+//const suppliers = ref([])
 const purchaseOrders = ref([])
 
 const showCategoryModal = ref(false)
 const showGroupModal = ref(false)
 const showBrandModal = ref(false)
 const showGenericModal = ref(false)
+
+// Load Site in modal dropdown
+const sites = ref([]);
+onMounted(() => {
+  loadSites();
+});
+
+const loadSites = async () => {
+  try {
+    const response = await getAllSites();
+    sites.value = response.data;
+  } catch (error) {
+    console.error('Failed to load sites:', error);
+  }
+};
+
+// Load Stocks in modal dropdown
+const stocks = ref([]);
+onMounted(() => {
+  loadStocks();
+});
+
+const loadStocks = async () => {
+  try {
+    const response = await getAllStocks();
+    stocks.value = response.data;
+  } catch (error) {
+    console.error('Failed to load stocks:', error);
+  }
+};
+
+// Load Stocks in modal dropdown
+const warehouses = ref([]);
+onMounted(() => {
+  loadWarehouses();
+});
+
+const loadWarehouses = async () => {
+  try {
+    const response = await getAllWarehouses();
+    warehouses.value = response.data;
+  } catch (error) {
+    console.error('Failed to load warehouses:', error);
+  }
+};
+
+// Load Group in modal dropdown
+const groups= ref([]);
+onMounted(() => {
+  loadGroups();
+});
+
+const loadGroups = async () => {
+  try {
+    const response = await getAllGroups();
+    groups.value = response.data;
+  } catch (error) {
+    console.error('Failed to load Product Groups:', error);
+  }
+};
+
+// Load UOMS in modal dropdown
+const uoms = ref([]);
+onMounted(() => {
+  loadUoms();
+});
+
+const loadUoms = async () => {
+  try {
+    const response = await getAllUoms();
+    uoms.value = response.data;
+  } catch (error) {
+    console.error('Failed to load warehouses:', error);
+  }
+};
+
+// Load Category in modal dropdown
+const categories = ref([]);
+onMounted(() => {
+  loadCategories();
+});
+
+const loadCategories = async () => {
+  try {
+    const response = await getAllCategories();
+    categories.value = response.data;
+  } catch (error) {
+    console.error('Failed to load Categories:', error);
+  }
+};
 
 function handleBrandSaved(brand) {
   showBrandModal.value = false
