@@ -231,7 +231,7 @@
 
 
     <!-- Modals -->
-    <!-- <SiteModal
+   <SiteModal
       :show="showSiteModal"
       @close="showSiteModal = false"
       @added="() => {
@@ -323,7 +323,7 @@
     <BrandModal :show="showBrandModal" @close="showBrandModal = false" @saved="handleBrandSaved" />
     <GstTaxModal :show="showGstModal" @close="showGstModal = false" @saved="handleGSTTaxSaved"/>
     <ProductLotModal :show="showLotModal" :productAttributes="productAttributes" @close="showLotModal = false" @saved="handleLotSaved"/>
-     -->
+     
   </div>
 </template>
 
@@ -343,7 +343,7 @@ import StockModal from '../components/modals/product/StockModal.vue'
 import WarehouseModal from '../components/modals/product/WarehouseModal.vue'
 import UomModal from '../components/modals/product/UomModal.vue'
 
-import { getAllCategories, getAllGroups, getAllSites, getAllStocks, getAllUoms, getAllWarehouses } from '../services/ProductService';
+import { getAllBrands, getAllCategories, getAllGroups, getAllSites, getAllStocks, getAllUoms, getAllWarehouses, getAllGenericProducts } from '../services/ProductService';
 
 const showSiteModal = ref(false)
 const showStockModal = ref(false)
@@ -436,7 +436,7 @@ const loadStocks = async () => {
   }
 };
 
-// Load Stocks in modal dropdown
+// Load Warehouse in modal dropdown
 const warehouses = ref([]);
 onMounted(() => {
   loadWarehouses();
@@ -493,6 +493,36 @@ const loadCategories = async () => {
     categories.value = response.data;
   } catch (error) {
     console.error('Failed to load Categories:', error);
+  }
+};
+
+// Load Category in modal dropdown
+const brands = ref([]);
+onMounted(() => {
+  loadBrands();
+});
+
+const loadBrands = async () => {
+  try {
+    const response = await getAllBrands();
+    brands.value = response.data;
+  } catch (error) {
+    console.error('Failed to load Brands:', error);
+  }
+};
+
+// Load Generic Product in modal dropdown
+const generics = ref([]);
+onMounted(() => {
+  loadGenerics();
+});
+
+const loadGenerics = async () => {
+  try {
+    const response = await getAllGenericProducts();
+    generics.value = response.data;
+  } catch (error) {
+    console.error('Failed to load Generics:', error);
   }
 };
 

@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.smartbill.productservice.model.Brand;
 import com.smartbill.productservice.model.Category;
+import com.smartbill.productservice.model.GenericProduct;
 import com.smartbill.productservice.model.Group;
 import com.smartbill.productservice.model.Product;
 import com.smartbill.productservice.model.ProductLot;
@@ -25,6 +26,7 @@ import com.smartbill.productservice.model.Vendor;
 import com.smartbill.productservice.model.Warehouse;
 import com.smartbill.productservice.repository.BrandRepository;
 import com.smartbill.productservice.repository.CategoryRepository;
+import com.smartbill.productservice.repository.GenericProductRepository;
 import com.smartbill.productservice.repository.GroupRepository;
 import com.smartbill.productservice.repository.ProductLotRepository;
 import com.smartbill.productservice.repository.ProductRepository;
@@ -49,6 +51,7 @@ public class ProductController {
     @Autowired private UomRepository uomRepository;
     @Autowired private ProductLotRepository productLotRepository;
     @Autowired private GroupRepository groupRepository;
+    @Autowired private GenericProductRepository genericProductRepository;
 
     // ========== Product CRUD ==========
 
@@ -123,5 +126,10 @@ public class ProductController {
     @GetMapping("/groups")
     public List<Group> getGroups() {
         return groupRepository.findAll();
+    }
+    
+    @GetMapping("/generic-products")
+    public List<GenericProduct> getGenericProducts() {
+        return genericProductRepository.findAll();
     }
 }
