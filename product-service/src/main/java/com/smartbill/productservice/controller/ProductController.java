@@ -21,6 +21,7 @@ import com.smartbill.productservice.model.Product;
 import com.smartbill.productservice.model.ProductLot;
 import com.smartbill.productservice.model.Site;
 import com.smartbill.productservice.model.Stock;
+import com.smartbill.productservice.model.Tax;
 import com.smartbill.productservice.model.Uom;
 import com.smartbill.productservice.model.Vendor;
 import com.smartbill.productservice.model.Warehouse;
@@ -32,6 +33,7 @@ import com.smartbill.productservice.repository.ProductLotRepository;
 import com.smartbill.productservice.repository.ProductRepository;
 import com.smartbill.productservice.repository.SiteRepository;
 import com.smartbill.productservice.repository.StockRepository;
+import com.smartbill.productservice.repository.TaxRepository;
 import com.smartbill.productservice.repository.UomRepository;
 import com.smartbill.productservice.repository.VendorRepository;
 import com.smartbill.productservice.repository.WarehouseRepository;
@@ -52,6 +54,7 @@ public class ProductController {
     @Autowired private ProductLotRepository productLotRepository;
     @Autowired private GroupRepository groupRepository;
     @Autowired private GenericProductRepository genericProductRepository;
+    @Autowired private TaxRepository taxRepository;
 
     // ========== Product CRUD ==========
 
@@ -131,5 +134,9 @@ public class ProductController {
     @GetMapping("/generic-products")
     public List<GenericProduct> getGenericProducts() {
         return genericProductRepository.findAll();
+    }
+    @GetMapping("/taxes")
+    public List<Tax> getTaxes() {
+        return taxRepository.findAll();
     }
 }

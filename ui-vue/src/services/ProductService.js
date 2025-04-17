@@ -88,3 +88,7 @@ export const createVendor = (data) => axios.post(`${API_BASE}/vendors`, data);
 // ----------------- PURCHASE ORDER -----------------
 export const getAllPurchaseOrders = () => axios.get(`${API_BASE}/purchase-orders`);
 export const createPurchaseOrder = (data) => axios.post(`${API_BASE}/purchase-orders`, data);
+
+// ----------------- Taxes -----------------
+export const getAllTaxes = () => axios.get(`${API_BASE}/taxes`);
+export const createTaxes = (data) => axios.post(`${API_BASE}/taxes`, data);

@@ -141,9 +141,9 @@
 <div>
   <label>Product Lot</label>
   <div class="flex items-center space-x-2">
-    <select v-model="product.lot_id" class="input">
+    <select v-model="product.id" class="input">
       <option v-for="lot in productLots" :key="lot.id" :value="lot.id">
-        {{ lot.lot_code }} (MFG: {{ lot.date_manufactured }} / EXP: {{ lot.date_expiry }})
+        {{ lot.lot_code }} (MFG: {{ lot.dateManufactured }} / EXP: {{ lot.dateExpiry }})
       </option>
     </select>
     <button type="button" class="btn" @click="showLotModal = true">+</button>
@@ -267,7 +267,7 @@
       }"
     />
 
-<StockModal
+<WarehouseModal
   :show="showWarehouseModal"
   @close="showWarehouseModal = false"
   @added="() => {
@@ -291,7 +291,7 @@
     getAllUoms()
       .then(response => {
         uoms.value = response.data;
-        const lastUoms = warehouses.value[uoms.value.length - 1];
+        const lastUoms = uoms.value[uoms.value.length - 1];
         if (lastUoms) {
           product.uom_id = lastUoms.id;
         }
@@ -343,7 +343,7 @@ import StockModal from '../components/modals/product/StockModal.vue'
 import WarehouseModal from '../components/modals/product/WarehouseModal.vue'
 import UomModal from '../components/modals/product/UomModal.vue'
 
-import { getAllBrands, getAllCategories, getAllGroups, getAllSites, getAllStocks, getAllUoms, getAllWarehouses, getAllGenericProducts } from '../services/ProductService';
+import { getAllBrands, getAllCategories, getAllGroups, getAllSites, getAllStocks, getAllUoms, getAllWarehouses, getAllGenericProducts, getAllTaxes, getAllProductLots, getAllVendors } from '../services/ProductService';
 
 const showSiteModal = ref(false)
 const showStockModal = ref(false)
@@ -365,7 +365,7 @@ const showUomModal = ref(false)
 //   { id: 'a2', name: 'Size: Medium' }
 // ])
 
-// const showGstModal = ref(false)
+const showGstModal = ref(false)
 // const gstTaxes = ref([{ id: 1, name: 'GST 18%', percentage: 18 }]) // sample list
 
 const product = ref({
@@ -405,6 +405,7 @@ const showCategoryModal = ref(false)
 const showGroupModal = ref(false)
 const showBrandModal = ref(false)
 const showGenericModal = ref(false)
+const showTaxes = ref(false)
 
 // Load Site in modal dropdown
 const sites = ref([]);
@@ -526,6 +527,37 @@ const loadGenerics = async () => {
   }
 };
 
+// Load Taxes in modal dropdown
+const gstTaxes = ref([]);
+onMounted(() => {
+  loadTaxes();
+});
+
+const loadTaxes = async () => {
+  try {
+    const response = await getAllTaxes();
+    gstTaxes.value = response.data;
+  } catch (error) {
+    console.error('Failed to load Taxes:', error);
+  }
+};
+
+
+// Load Product Lots in modal dropdown
+const productLots = ref([]);
+onMounted(() => {
+  loadProductLots();
+});
+
+const loadProductLots = async () => {
+  try {
+    const response = await getAllProductLots();
+    productLots.value = response.data;
+  } catch (error) {
+    console.error('Failed to load Product Lots:', error);
+  }
+};
+
 function handleBrandSaved(brand) {
   showBrandModal.value = false
 }
@@ -547,6 +579,9 @@ function handleCategorySaved(category) {
 const handleGenericSaved = (data) => {
   showGenericModal.value = false
 }
+const handleTaxSaved = (data) => {
+  showTaxes.value = false
+}
 function saveProduct() {
   console.log('Saving product:', product.value)
   alert('Product saved!')
@@ -558,7 +593,7 @@ const vendors = ref([])
 
 onMounted(async () => {
   try {
-    const response = await axios.get('http://localhost:8081/api/vendors/listAll')
+    const response = await getAllVendors()
     vendors.value = response.data
   } catch (error) {
     console.error('Error fetching vendors:', error)
