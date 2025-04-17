@@ -1,7 +1,23 @@
 <template>
   <div class="p-6">
+        <!-- Toggle Button -->
+        <div class="mb-4">
+      <button
+        @click="toggleForm"
+        class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+      >
+        {{ showForm ? 'Hide Product Entry' : 'Add Product' }}
+      </button>
+    </div>
+
+  <!-- Collapsible Form Section -->
+  <div v-show="showForm" class="mb-6 p-4 border rounded bg-gray-50"> 
+    <h3 class="text-lg font-semibold mb-4">
+      {{ selectedProduct ? 'Edit Product' : 'Add Product' }}
+    </h3>
+    
     <h2 class="text-2xl font-bold mb-4">Product Master</h2>
-    <form class="grid grid-cols-4 gap-4">
+    <form @submit.prevent="saveProduct" class="grid grid-cols-2 gap-4">
 
 <!-- Basic Details -->
 <div class="col-span-4 text-lg font-semibold mt-4 mb-2">Basic Details</div>
@@ -221,14 +237,49 @@
 </div>
 
 <!-- Actions -->
-<div class="col-span-4 mt-6">
-  <button class="btn bg-blue-600 text-white px-4 py-2 rounded" @click.prevent="saveProduct">
+<div class="col-span-2 text-right mt-4">
+  <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
     Save Product
   </button>
 </div>
 
 </form>
+</div>
 
+
+    <!-- Product List -->
+    <div class="bg-white shadow rounded-lg p-4">
+      <h3 class="text-lg font-semibold mb-4">Product List</h3>
+      <table class="min-w-full table-auto border">
+        <thead class="bg-gray-100">
+          <tr>
+            <th class="px-4 py-2 border">Name</th>
+            <th class="px-4 py-2 border">SKU</th>
+            <th class="px-4 py-2 border">Price</th>
+            <th class="px-4 py-2 border">Qty</th>
+            <th class="px-4 py-2 border">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(prod, index) in products" :key="index" class="text-center">
+            <td class="border px-4 py-2">{{ prod.name }}</td>
+            <td class="border px-4 py-2">{{ prod.sku }}</td>
+            <td class="border px-4 py-2">{{ prod.unit_price }}</td>
+            <td class="border px-4 py-2">{{ prod.quantity }}</td>
+            <td class="border px-4 py-2">
+              <button @click="editProduct(prod)" class="text-blue-600 hover:underline mr-2">Edit</button>
+              <button @click="deleteProduct(prod.id)" class="text-red-600 hover:underline">Delete</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+
+</div>
+
+
+<!-- ===================   Starting Modal Definition =================== -->
 
     <!-- Modals -->
    <SiteModal
@@ -323,9 +374,13 @@
     <BrandModal :show="showBrandModal" @close="showBrandModal = false" @saved="handleBrandSaved" />
     <GstTaxModal :show="showGstModal" @close="showGstModal = false" @saved="handleGSTTaxSaved"/>
     <ProductLotModal :show="showLotModal" :productAttributes="productAttributes" @close="showLotModal = false" @saved="handleLotSaved"/>
-     
-  </div>
 </template>
+
+
+
+
+
+
 
 <script setup>
 import { ref, onMounted } from 'vue'
@@ -349,58 +404,9 @@ const showSiteModal = ref(false)
 const showStockModal = ref(false)
 const showWarehouseModal = ref(false)
 const showUomModal = ref(false)
-
-//const sites = ref([{ id: 1, name: 'Site A' }])
-//const stocks = ref([{ id: 1, name: 'Stock Room 1' }])
-// const warehouses = ref([{ id: 1, name: 'Warehouse Alpha' }])
-//const uoms = ref([{ id: 1, name: 'Piece' }])
-
 const showLotModal = ref(false)
-// const productLots = ref([
-//   { id: 1, lot_code: 'LOT001', date_manufactured: '2024-01-01', date_expiry: '2025-01-01', product_attribute_value_id: '' }
-// ])
-
-// const productAttributes = ref([
-//   { id: 'a1', name: 'Color: Red' },
-//   { id: 'a2', name: 'Size: Medium' }
-// ])
-
 const showGstModal = ref(false)
-// const gstTaxes = ref([{ id: 1, name: 'GST 18%', percentage: 18 }]) // sample list
-
-const product = ref({
-  product_code: '',
-  product_name: '',
-  category_id: '',
-  group_id: '',
-  brand_id: '',
-  generic_id: '',
-  product_description: '',
-  product_price: 0,
-  pack_size: 0,
-  average_cost: 0,
-  single_unit_product_code: '',
-  hsn_code: '',
-  model_id: '',
-  warranty_terms: '',
-  lot_information: '',
-  supplierId: '',
-  purchaseOrderId: '',
-  productAttributeId: '',
-  has_attributes: false,
-  has_lots: false,
-  has_instances: false,
-  is_active: true,
-  deleted: false
-})
-
-//const categories = ref([{ id: 1, name: 'Electronics' }])
-// const groups = ref([{ id: 1, name: 'Group A' }])
-// const brands = ref([{ id: 1, name: 'Brand X' }])
-// const generics = ref([{ id: 1, name: 'Generic Y' }])
-//const suppliers = ref([])
 const purchaseOrders = ref([])
-
 const showCategoryModal = ref(false)
 const showGroupModal = ref(false)
 const showBrandModal = ref(false)
@@ -582,10 +588,10 @@ const handleGenericSaved = (data) => {
 const handleTaxSaved = (data) => {
   showTaxes.value = false
 }
-function saveProduct() {
-  console.log('Saving product:', product.value)
-  alert('Product saved!')
-}
+// function saveProduct() {
+//   console.log('Saving product:', product.value)
+//   alert('Product saved!')
+// }
 
 // load dropdowns
 
@@ -599,6 +605,84 @@ onMounted(async () => {
     console.error('Error fetching vendors:', error)
   }
 })
+
+// ========================================= Product Related code ================================================
+const products = ref([])
+const showForm = ref(false)
+const selectedProduct = ref(null)
+const product = ref({
+  product_code: '',
+  product_name: '',
+  site_id: null,
+  stock_id: null,
+  warehouse_id: null,
+  category_id: null,
+  group_id: null,
+  brand_id: null,
+  generic_id: null,
+  uom_id: null,
+  product_description: '',
+  product_purchase_price: 0,
+  product_mrp: 0,
+  pack_size: 0,
+  average_cost: 0,
+  single_unit_product_code: '',
+  hsn_code: '',
+  hsn_description: '',
+  model_id: '',
+  warranty_terms: '',
+  id: null, // Product Lot
+  gst_id: null,
+  purchaseOrderId: null,
+  productAttributeId: null,
+  product_discounts: 0
+})
+const form = ref({
+  name: '',
+  sku: '',
+  unit_price: 0,
+  quantity: 0,
+})
+
+const loadProducts = async () => {
+  products.value = await getAllProducts()
+}
+
+const toggleForm = () => {
+  showForm.value = !showForm.value
+  if (!showForm.value) resetForm()
+}
+
+const editProduct = (product) => {
+  form.value = { ...product }
+  selectedProduct.value = product
+  showForm.value = true
+}
+
+const resetForm = () => {
+  selectedProduct.value = null
+  form.value = {
+    name: '',
+    sku: '',
+    unit_price: 0,
+    quantity: 0,
+  }
+}
+
+// const saveProduct = async () => {
+//   await saveOrUpdateProduct(form.value)
+//   await loadProducts()
+//   resetForm()
+//   showForm.value = false
+// }
+
+// const deleteProduct = async (id) => {
+//   await deleteProductById(id)
+//   await loadProducts()
+// }
+
+// onMounted(loadProducts)
+
 </script>
 
 <style scoped>
