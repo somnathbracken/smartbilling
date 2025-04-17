@@ -15,11 +15,14 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @Column(name = "product_code")
     private String productCode;
 
     private String hsnCode;
     
-    private Integer categoryId;
+    private String hsnDescription;
+
+	private Integer categoryId;
 
     private Integer groupId;
 
@@ -33,6 +36,7 @@ public class Product {
 
     private String description;
 
+    @Column(name = "unit_price")
     private String unitPrice;
 
     private String hasInstances;
@@ -353,5 +357,12 @@ public class Product {
 
 	public void setStatus(String status) {
 		this.status = status;
+	}
+    public String getHsnDescription() {
+		return hsnDescription;
+	}
+
+	public void setHsnDescription(String hsnDescription) {
+		this.hsnDescription = hsnDescription;
 	}
 }

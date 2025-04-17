@@ -63,7 +63,7 @@ public class ProductController {
         return productRepository.findAll();
     }
 
-    @PostMapping
+    @PostMapping("/create-product")
     public Product createProduct(@RequestBody Product product) {
         return productRepository.save(product);
     }
