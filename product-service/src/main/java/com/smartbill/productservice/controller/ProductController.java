@@ -58,7 +58,7 @@ public class ProductController {
 
     // ========== Product CRUD ==========
 
-    @GetMapping
+    @GetMapping("/products")
     public List<Product> getAllProducts() {
         return productRepository.findAll();
     }

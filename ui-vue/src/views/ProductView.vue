@@ -355,7 +355,7 @@ const showUomModal = ref(false)
 // const warehouses = ref([{ id: 1, name: 'Warehouse Alpha' }])
 //const uoms = ref([{ id: 1, name: 'Piece' }])
 
-// const showLotModal = ref(false)
+const showLotModal = ref(false)
 // const productLots = ref([
 //   { id: 1, lot_code: 'LOT001', date_manufactured: '2024-01-01', date_expiry: '2025-01-01', product_attribute_value_id: '' }
 // ])
