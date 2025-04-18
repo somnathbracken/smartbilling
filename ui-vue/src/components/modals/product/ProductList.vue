@@ -40,6 +40,7 @@
           <th class="px-4 py-2 border border-gray-300 text-left">Product Code</th>
           <th class="px-4 py-2 border border-gray-300 text-right">MRP</th>
           <th class="px-4 py-2 border border-gray-300 text-right">Qty</th>
+          <th class="px-4 py-2 border border-gray-300 text-left">Active?</th>
           <th class="px-4 py-2 border border-gray-300 text-right">Status</th>
           <th class="px-4 py-2 border border-gray-300 text-center">Actions</th>
         </tr>
@@ -50,6 +51,7 @@
               <td class="px-4 py-2 border border-gray-200 font-medium text-left">{{ prod.productCode }}</td>
               <td class="px-4 py-2 border border-gray-200 text-right">{{ parseFloat(prod.mrp).toFixed(2) }}</td>
               <td class="px-4 py-2 border border-gray-200 text-right">{{ prod.quantity }}</td>
+              <td class="px-4 py-2 border border-gray-200 font-medium text-left">{{ prod.isActive }}</td>
               <td class="px-4 py-2 border border-gray-200 font-medium text-left">{{ prod.deleted }}</td>
               <td class="px-4 py-2 border border-gray-200 text-center space-x-2">
                 <button @click="openEditModal(prod)" class="btn px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600">Edit</button>

@@ -353,6 +353,8 @@ import { createProduct, getAllProducts, getAllBrands, getAllCategories, getAllGr
 // const purchaseOrders = ref([])
 // const showTaxes = ref(false)
 
+// ---------------------------- Modal & Dropdown Loading started ----------------------------------
+
 // Site related dropdown and Modal
 const showSiteModal = ref(false)
 import SiteModal from './SiteModal.vue'
@@ -369,7 +371,6 @@ const loadSites = async () => {
     console.error('Failed to load sites:', error);
   }
 };
-// ---------------------------- Modal & Dropdown Loading started ----------------------------------
 
 // Load Stocks in modal dropdown
 import StockModal from './StockModal.vue'
