@@ -18,6 +18,20 @@
   <div class="p-6 bg-white rounded-xl shadow-md">
     <h2 class="text-2xl font-semibold text-gray-800 mb-6">Product List</h2>
 
+    <!-- -------------------- Status Toggle switch code -------------------- -->
+    <div class="flex items-center space-x-2 mb-4">
+      <label class="text-sm font-medium text-gray-700">Show Deleted</label>
+      <label class="relative inline-flex items-center cursor-pointer">
+        <input type="checkbox" v-model="showDeleted" class="sr-only peer">
+        <div
+          class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-500 rounded-full peer peer-checked:bg-green-500 transition"
+        ></div>
+        <div
+          class="absolute left-0.5 top-0.5 w-5 h-5 bg-white rounded-full shadow-md transform peer-checked:translate-x-full transition"
+        ></div>
+      </label>
+    </div>
+    <!-- -------------------- Status Toggle switch finished -------------------- -->
     <div class="overflow-x-auto">
       <table class="min-w-full border border-gray-300 border-collapse text-sm">
         <thead class="bg-gray-100">
@@ -26,6 +40,7 @@
           <th class="px-4 py-2 border border-gray-300 text-left">Product Code</th>
           <th class="px-4 py-2 border border-gray-300 text-right">MRP</th>
           <th class="px-4 py-2 border border-gray-300 text-right">Qty</th>
+          <th class="px-4 py-2 border border-gray-300 text-right">Status</th>
           <th class="px-4 py-2 border border-gray-300 text-center">Actions</th>
         </tr>
       </thead>
@@ -35,6 +50,7 @@
               <td class="px-4 py-2 border border-gray-200 font-medium text-left">{{ prod.productCode }}</td>
               <td class="px-4 py-2 border border-gray-200 text-right">{{ parseFloat(prod.mrp).toFixed(2) }}</td>
               <td class="px-4 py-2 border border-gray-200 text-right">{{ prod.quantity }}</td>
+              <td class="px-4 py-2 border border-gray-200 font-medium text-left">{{ prod.deleted }}</td>
               <td class="px-4 py-2 border border-gray-200 text-center space-x-2">
                 <button @click="editProduct(prod)" class="btn-edit">Edit</button>
                 <button @click="deleteProduct(prod.id)" class="btn-delete">Delete</button>
@@ -99,12 +115,12 @@
     const pageSize = 5;
 
     // Step 1: Filtered products
-    const filtered = computed(() =>
-      products.value.filter(p =>
-        p.name.toLowerCase().includes(search.value.toLowerCase())||
-        p.productCode.toLowerCase().includes(search.value.toLowerCase())
-      )
-    );
+    // const filtered = computed(() =>
+    //   products.value.filter(p =>
+    //     p.name.toLowerCase().includes(search.value.toLowerCase())||
+    //     p.productCode.toLowerCase().includes(search.value.toLowerCase())
+    //   )
+    // );
 
     // Step 2: Paginated products from filtered result
     const paginatedProducts = computed(() =>
@@ -134,6 +150,22 @@
       doc.save('vendors.pdf')
     }
 
+    //----------------------------------- Status Toggle Switch ------------------------------------------
+    const showDeleted = ref(false)
+
+    const filtered = computed(() => {
+      return products.value.filter(p => {
+        const matchesSearch =
+          p.name.toLowerCase().includes(search.value.toLowerCase()) ||
+          p.productCode.toLowerCase().includes(search.value.toLowerCase());
+
+        const matchesStatus = showDeleted.value
+          ? p.deleted === true || p.deleted === 'true'
+          : p.deleted === false || p.deleted === 'false';
+
+        return matchesSearch && matchesStatus;
+      });
+    });
   </script>
   
   <style scoped>
@@ -158,6 +190,18 @@
 }
 .btn-delete {
   @apply bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 shadow-sm transition duration-150 ease-in-out;
+}
+
+/* For status Toggle Switch */
+.toggle-checkbox {
+  @apply h-5 w-10 rounded-full appearance-none bg-gray-300 checked:bg-green-500 transition duration-300 relative;
+  background-position: left center;
+  background-repeat: no-repeat;
+}
+
+.toggle-checkbox:checked::before {
+  content: '';
+  @apply w-4 h-4 bg-white rounded-full absolute left-5 top-0.5 transform -translate-x-full transition-transform duration-300;
 }
 
   </style>

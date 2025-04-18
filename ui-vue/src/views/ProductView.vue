@@ -6,7 +6,7 @@
         @click="toggleForm"
         class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
       >
-        {{ showForm ? 'Hide Product Entry' : 'Add Product' }}
+        {{ showForm ? '- Hide Product Entry' : '+ Add New Product' }}
       </button>
     </div>
 
