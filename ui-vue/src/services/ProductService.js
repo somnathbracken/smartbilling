@@ -25,7 +25,11 @@ const API_BASE = 'http://localhost:8082/api'; // Adjust if needed
 // ----------------- PRODUCT -----------------
 export const getAllProducts = () => axios.get(`${API_BASE}/products`);
 export const getProductById = (id) => axios.get(`${API_BASE}/products/${id}`);
-export const createProduct = (data) => axios.post(`${API_BASE}/create-product`, data);
+export const createProduct = (data) => axios.post(`${API_BASE}/create-product`, data, {
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  });
 export const updateProduct = (id, data) => axios.put(`${API_BASE}/products/${id}`, data);
 export const deleteProduct = (id) => axios.delete(`${API_BASE}/products/${id}`);
 

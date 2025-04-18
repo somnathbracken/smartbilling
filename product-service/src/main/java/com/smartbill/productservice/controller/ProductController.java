@@ -65,6 +65,8 @@ public class ProductController {
 
     @PostMapping("/create-product")
     public Product createProduct(@RequestBody Product product) {
+    	System.out.println("Product Received: " + product); // This should print!
+    	System.out.println("Product code:: "+ product.getProductCode());
         return productRepository.save(product);
     }
 

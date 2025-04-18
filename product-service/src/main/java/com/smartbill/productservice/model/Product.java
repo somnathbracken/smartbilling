@@ -15,29 +15,30 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "product_code")
+    //@Column(name = "product_code")
     private String productCode;
 
     private String hsnCode;
     
     private String hsnDescription;
 
-	private Integer categoryId;
+	private String categoryId;
 
-    private Integer groupId;
+    private String groupId;
 
-    private Integer brandId;
+    private String brandId;
 
-    private Integer genericId;
+    private String genericId;
 
-    private Integer modelId;
+    private String modelId;
 
-    private String name;
+	private String name;
 
     private String description;
 
-    @Column(name = "unit_price")
-    private String unitPrice;
+    private String pruchasePrice;
+    
+    private String mrp;
 
     private String hasInstances;
 
@@ -45,7 +46,7 @@ public class Product {
 
     private String hasAttributes;
 
-    private String defaultUom;
+//    private String defaultUom;
 
     private String packSize;
 
@@ -79,13 +80,19 @@ public class Product {
 
     private String stockId;
 
-    private String uomId;
+//    private String uomId;
 
     private String productLotId;
-
+    
+    private String discounts;
+    
     private Integer quantity;
 
-    private String status;
+//    private String status;
+    
+    private String purchaseOrderId;
+    
+    private String productAttributeId;
     
     public Integer getId() {
 		return id;
@@ -93,6 +100,32 @@ public class Product {
 
 	public void setId(Integer id) {
 		this.id = id;
+	}
+
+	
+	
+	public String getDiscounts() {
+		return discounts;
+	}
+
+	public void setDiscounts(String discounts) {
+		this.discounts = discounts;
+	}
+
+	public String getPruchasePrice() {
+		return pruchasePrice;
+	}
+
+	public void setPruchasePrice(String pruchasePrice) {
+		this.pruchasePrice = pruchasePrice;
+	}
+
+	public String getMrp() {
+		return mrp;
+	}
+
+	public void setMrp(String mrp) {
+		this.mrp = mrp;
 	}
 
 	public String getProductCode() {
@@ -111,43 +144,23 @@ public class Product {
 		this.hsnCode = hsnCode;
 	}
 
-	public Integer getCategoryId() {
-		return categoryId;
-	}
-
-	public void setCategoryId(Integer categoryId) {
+    public void setCategoryId(String categoryId) {
 		this.categoryId = categoryId;
 	}
 
-	public Integer getGroupId() {
-		return groupId;
-	}
-
-	public void setGroupId(Integer groupId) {
+	public void setGroupId(String groupId) {
 		this.groupId = groupId;
 	}
 
-	public Integer getBrandId() {
-		return brandId;
-	}
-
-	public void setBrandId(Integer brandId) {
+	public void setBrandId(String brandId) {
 		this.brandId = brandId;
 	}
 
-	public Integer getGenericId() {
-		return genericId;
-	}
-
-	public void setGenericId(Integer genericId) {
+	public void setGenericId(String genericId) {
 		this.genericId = genericId;
 	}
 
-	public Integer getModelId() {
-		return modelId;
-	}
-
-	public void setModelId(Integer modelId) {
+	public void setModelId(String modelId) {
 		this.modelId = modelId;
 	}
 
@@ -168,11 +181,11 @@ public class Product {
 	}
 
 	public String getUnitPrice() {
-		return unitPrice;
+		return pruchasePrice;
 	}
 
 	public void setUnitPrice(String unitPrice) {
-		this.unitPrice = unitPrice;
+		this.pruchasePrice = unitPrice;
 	}
 
 	public String getHasInstances() {
@@ -197,14 +210,6 @@ public class Product {
 
 	public void setHasAttributes(String hasAttributes) {
 		this.hasAttributes = hasAttributes;
-	}
-
-	public String getDefaultUom() {
-		return defaultUom;
-	}
-
-	public void setDefaultUom(String defaultUom) {
-		this.defaultUom = defaultUom;
 	}
 
 	public String getPackSize() {
@@ -327,14 +332,6 @@ public class Product {
 		this.stockId = stockId;
 	}
 
-	public String getUomId() {
-		return uomId;
-	}
-
-	public void setUomId(String uomId) {
-		this.uomId = uomId;
-	}
-
 	public String getProductLotId() {
 		return productLotId;
 	}
@@ -351,13 +348,6 @@ public class Product {
 		this.quantity = quantity;
 	}
 
-	public String getStatus() {
-		return status;
-	}
-
-	public void setStatus(String status) {
-		this.status = status;
-	}
     public String getHsnDescription() {
 		return hsnDescription;
 	}
@@ -365,4 +355,41 @@ public class Product {
 	public void setHsnDescription(String hsnDescription) {
 		this.hsnDescription = hsnDescription;
 	}
+
+	public String getPurchaseOrderId() {
+		return purchaseOrderId;
+	}
+
+	public void setPurchaseOrderId(String purchaseOrderId) {
+		this.purchaseOrderId = purchaseOrderId;
+	}
+
+	public String getProductAttributeId() {
+		return productAttributeId;
+	}
+
+	public void setProductAttributeId(String productAttributeId) {
+		this.productAttributeId = productAttributeId;
+	}
+
+	public String getCategoryId() {
+		return categoryId;
+	}
+
+	public String getGroupId() {
+		return groupId;
+	}
+
+	public String getBrandId() {
+		return brandId;
+	}
+
+	public String getGenericId() {
+		return genericId;
+	}
+
+	public String getModelId() {
+		return modelId;
+	}
+	
 }

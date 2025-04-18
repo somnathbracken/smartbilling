@@ -10,11 +10,11 @@
           <div class="col-span-4 text-lg font-semibold mt-4 mb-2">Basic Details</div>
           <div>
             <label>Product Code</label>
-            <input v-model="product.productcode" class="input" type="text" />
+            <input v-model="product.productCode" class="input" type="text" />
           </div>
           <div>
             <label>Product Name</label>
-            <input v-model="product.product_name" class="input" type="text" />
+            <input v-model="product.name" class="input" type="text" />
           </div>
 
           <!-- Inventory Details -->
@@ -22,7 +22,7 @@
           <div>
             <label>Site</label>
             <div class="flex space-x-2 items-center">
-              <select v-model="product.site_id" class="input">
+              <select v-model="product.siteId" class="input">
                 <option v-for="site in sites" :key="site.id" :value="site.id">{{ site.name }}</option>
               </select>
               <button type="button" class="btn" @click="showSiteModal = true">+</button>
@@ -31,7 +31,7 @@
           <div>
             <label>Stock Location</label>
             <div class="flex space-x-2 items-center">
-              <select v-model="product.stock_id" class="input">
+              <select v-model="product.stockId" class="input">
                 <option v-for="stock in stocks" :key="stock.id" :value="stock.id">{{ stock.name }}</option>
               </select>
               <button type="button" class="btn" @click="showStockModal = true">+</button>
@@ -40,7 +40,7 @@
           <div>
             <label>Warehouse</label>
             <div class="flex space-x-2 items-center">
-              <select v-model="product.warehouse_id" class="input">
+              <select v-model="product.warehouseId" class="input">
                 <option v-for="warehouse in warehouses" :key="warehouse.id" :value="warehouse.id">{{ warehouse.name }}</option>
               </select>
               <button type="button" class="btn" @click="showWarehouseModal = true">+</button>
@@ -51,7 +51,7 @@
           <div>
             <label>Category</label>
             <div class="flex items-center space-x-2">
-              <select v-model="product.category_id" class="input">
+              <select v-model="product.categoryId" class="input">
                 <option v-for="cat in categories" :key="cat.id" :value="cat.id">{{ cat.name }}</option>
               </select>
               <button type="button" class="btn" @click="showCategoryModal = true">+</button>
@@ -60,7 +60,7 @@
           <div>
             <label>Group</label>
             <div class="flex items-center space-x-2">
-              <select v-model="product.group_id" class="input">
+              <select v-model="product.groupId" class="input">
                 <option v-for="item in groups" :key="item.id" :value="item.id">{{ item.name }}</option>
               </select>
               <button type="button" class="btn" @click="showGroupModal = true">+</button>
@@ -69,7 +69,7 @@
           <div>
             <label>Brand</label>
             <div class="flex items-center space-x-2">
-              <select v-model="product.brand_id" class="input">
+              <select v-model="product.brandId" class="input">
                 <option v-for="item in brands" :key="item.id" :value="item.id">{{ item.name }}</option>
               </select>
               <button type="button" class="btn" @click="showBrandModal = true">+</button>
@@ -78,7 +78,7 @@
           <div>
             <label>Generic Product</label>
             <div class="flex items-center space-x-2">
-              <select v-model="product.generic_id" class="input">
+              <select v-model="product.genericId" class="input">
                 <option v-for="item in generics" :key="item.id" :value="item.id">{{ item.name }}</option>
               </select>
               <button type="button" class="btn" @click="showGenericModal = true">+</button>
@@ -87,7 +87,7 @@
           <div>
             <label>UOM</label>
             <div class="flex space-x-2 items-center">
-              <select v-model="product.uom_id" class="input">
+              <select v-model="product.unitOfMeasure" class="input">
                 <option v-for="uom in uoms" :key="uom.id" :value="uom.id">{{ uom.name }}</option>
               </select>
               <button type="button" class="btn" @click="showUomModal = true">+</button>
@@ -97,54 +97,58 @@
           <div class="col-span-4 text-lg font-semibold mt-4 mb-2">Descriptions</div>
           <div class="col-span-4">
             <label>Product Description</label>
-            <textarea v-model="product.product_description" class="input"></textarea>
+            <textarea v-model="product.description" class="input"></textarea>
           </div>
 
           <!-- Pricing & SKU -->
           <div class="col-span-4 text-lg font-semibold mt-4 mb-2">Pricing & SKU</div>
           <div>
             <label>Price</label>
-            <input v-model="product.product_purchase_price" class="input" type="number" step="0.01" />
+            <input v-model="product.pruchasePrice" class="input" type="number" step="0.01" />
           </div>
           <div>
             <label>MRP</label>
-            <input v-model="product.product_mrp" class="input" type="number" step="0.01" />
+            <input v-model="product.mrp" class="input" type="number" step="0.01" />
           </div>
           <div>
             <label>Pack Size</label>
-            <input v-model="product.pack_size" class="input" type="number" />
+            <input v-model="product.packSize" class="input" type="number" />
           </div>
           <div>
+            <label>Quantity</label>
+            <input v-model="product.quantity" class="input" type="number" />
+          </div>          
+          <div>
             <label>Average Cost</label>
-            <input v-model="product.average_cost" class="input" type="number" step="0.01" />
+            <input v-model="product.averageCost" class="input" type="number" step="0.01" />
           </div>
           <div>
             <label>Single Unit Product Code</label>
-            <input v-model="product.single_unit_product_code" class="input" type="text" />
+            <input v-model="product.singleUnitProductCode" class="input" type="text" />
           </div>
 
           <!-- Tax & Compliance -->
           <div class="col-span-4 text-lg font-semibold mt-4 mb-2">Tax & Compliance</div>
           <div>
             <label>HSN Code</label>
-            <input v-model="product.hsn_code" class="input" type="text" />
+            <input v-model="product.hsnCode" class="input" type="text" />
           </div>
           <div>
             <label>HSN Description</label>
-            <input v-model="product.hsn_description" class="input" type="text" />
+            <input v-model="product.hsnDescription" class="input" type="text" />
           </div>
           <div>
             <label>Model/Part ID</label>
-            <input v-model="product.model_id" class="input" type="text" />
+            <input v-model="product.modelId" class="input" type="text" />
           </div>
           <div>
             <label>Warranty Terms</label>
-            <input v-model="product.warranty_terms" class="input" type="text" />
+            <input v-model="product.warrantyTerms" class="input" type="text" />
           </div>
           <div>
             <label>Product Lot</label>
             <div class="flex items-center space-x-2">
-              <select v-model="product.id" class="input">
+              <select v-model="product.productLotId" class="input">
                 <option v-for="lot in productLots" :key="lot.id" :value="lot.id">
                   {{ lot.lot_code }} (MFG: {{ lot.dateManufactured }} / EXP: {{ lot.dateExpiry }})
                 </option>
@@ -156,7 +160,7 @@
           <div>
             <label>GST Tax</label>
             <div class="flex items-center space-x-2">
-              <select v-model="product.gst_id" class="input">
+              <select v-model="product.gstPercentage" class="input">
                 <option v-for="gst in gstTaxes" :key="gst.id" :value="gst.id">{{ gst.name }} ({{ gst.percentage }}%)</option>
               </select>
               <button type="button" class="btn" @click="showGstModal = true">+</button>
@@ -171,7 +175,7 @@
               <option v-for="supplier in suppliers" :key="supplier.id" :value="supplier.id">{{ supplier.name }}</option>
             </select> -->
             <label for="vendor">Vendor</label>
-            <select v-model="selectedVendor" class="form-select border p-2 rounded w-full">
+            <select v-model="product.vendorId" class="form-select border p-2 rounded w-full">
               <option disabled value="">Select Vendor</option>
               <option v-for="vendor in vendors" :key="vendor.id" :value="vendor.id">
                 {{ vendor.name }}
@@ -197,7 +201,7 @@
           <div class="col-span-4 text-lg font-semibold mt-4 mb-2">Discounts</div>
           <div>
             <label>Discounts(%)</label>
-            <input v-model="product.product_discounts" class="input" type="number" step="0.01" />
+            <input v-model="product.discounts" class="input" type="number" step="0.01" />
           </div>
 
           <!-- Flags & Status -->
@@ -216,7 +220,7 @@
           </div> -->
           <div class="flex items-center">
             <label class="mr-2">Is Active</label>
-            <input type="checkbox" v-model="product.is_active" />
+            <input type="checkbox" v-model="product.isActive" />
           </div>
           <div class="flex items-center">
             <label class="mr-2">Deleted</label>
@@ -563,34 +567,75 @@ const handleTaxSaved = (data) => {
 }
 //----------------------- Product Definition started here -----------------------------------
 const product = ref({
-  productcode: '',
-  product_name: '',
-  site_id: null,
-  stock_id: null,
-  warehouse_id: null,
-  category_id: null,
-  group_id: null,
-  brand_id: null,
-  generic_id: null,
-  uom_id: null,
-  product_description: '',
-  product_purchase_price: 0,
-  product_mrp: 0,
-  pack_size: 0,
-  average_cost: 0,
-  single_unit_product_code: '',
-  hsn_code: '',
-  hsn_description: '',
-  model_id: '',
-  warranty_terms: '',
-  id: null, // Product Lot
-  gst_id: null,
-  purchaseOrderId: null,
-  productAttributeId: null,
-  product_discounts: 0
+productCode: null,
+hsnCode: null,
+hsnDescription: null,
+genericId: null,
+modelId: null,
+name: null,
+description: null,
+pruchasePrice: 0,
+mrp: 0,
+hasInstances: null,
+hasLots: null,
+hasAttributes: null,
+// defaultUom: null,
+packSize: 0,
+averageCost: 0,
+singleUnitProductCode: null,
+dimensionGroup: null,
+lotInformation: 0,
+warrantyTerms: null,
+sku: null,
+gstPercentage: 0,
+unitOfMeasure: null,
+vendorId: null,
+siteId: null,
+warehouseId: null,
+categoryId: null,
+groupId: null,
+brandId: null,
+stockId: null,
+uomId: null,
+productLotId: null,
+discounts: 0,
+quantity: 0,
+purchaseOrderId: null,
+productAttributeId: null,
+isActive: true,
+deleted: false
 })
+
 const resetForm = () => {
   product.value = { productcode: '' }
+}
+
+const saveProduct = async () => {
+  alert('Saving Product!')
+  console.log("Saving Product:", JSON.stringify(product.value, null, 2))
+  if (product.value.id) {
+    // Update existing product
+    await updateProduct(product.value.id, product.value)
+  } else {
+    // Create new product
+    //alert('calling createProduct')
+    await createProduct(product.value)
+  }
+
+  await loadProducts()
+  resetForm()
+  //showForm.value = false
+  alert('Product saved!')
+}
+const loadProducts = async () => {
+  try {
+    const res = await getAllProducts()
+    // Make sure it's an array
+    product.value = Array.isArray(res.data) ? res.data : []
+  } catch (err) {
+    console.error('Failed to load products:', err)
+    product.value = []
+  }
 }
   </script>
   
