@@ -30,7 +30,7 @@ export const createProduct = (data) => axios.post(`${API_BASE}/create-product`, 
       'Content-Type': 'application/json'
     }
   });
-export const updateProduct = (id, data) => axios.put(`${API_BASE}/products/${id}`, data);
+export const updateProductById = (id, data) => axios.put(`${API_BASE}/product/${id}`, data);
 export const deleteProductById = (id) => axios.delete(`${API_BASE}/product/${id}`);
 
 // ----------------- CATEGORY -----------------

@@ -13,11 +13,14 @@
 
 <script setup>
 const menuItems = [
+  { name: 'Administration', route: '/admin' },
   { name: 'Customers', route: '/customers' },
   { name: 'Vendors', route: '/vendors' },
   { name: 'Products', route: '/products' },
-  { name: 'Stocks', route: '/stocks' },
-  { name: 'Purchase Order', route: '/purchase' },
+  { name: 'Stock Journal', route: '/stocks' },
+  // { name: 'Delivery Challan', route: '/deliveryChallan' },
+  // { name: 'Sales Order', route: '/delivery' },
+  // { name: 'Purchase Order', route: '/purchase' },
   { name: 'Sales Invoice', route: '/sale' },
   { name: 'Reports', route: '/reports' },
   { name: 'Logout', route: '/logout' }

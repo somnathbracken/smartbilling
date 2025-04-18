@@ -52,7 +52,7 @@
               <td class="px-4 py-2 border border-gray-200 text-right">{{ prod.quantity }}</td>
               <td class="px-4 py-2 border border-gray-200 font-medium text-left">{{ prod.deleted }}</td>
               <td class="px-4 py-2 border border-gray-200 text-center space-x-2">
-                <button @click="editProduct(prod)" class="btn-edit">Edit</button>
+                <button @click="openEditModal(prod)" class="btn px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600">Edit</button>
                 <button @click="deleteProduct(prod.id)" class="btn-delete">Delete</button>
               </td>
             </tr>
@@ -76,6 +76,7 @@
       {{ page }}
     </button>
   </div>
+  <EditProductModal v-if="showEditModal" :product="editableProduct" @close="showEditModal = false" @update="handleProductUpdate"/>
 </template>
   
   <script setup>
@@ -161,6 +162,46 @@
     const totalPages = computed(() => Math.ceil(filtered.value.length / pageSize));
 
 //----------------------------------- End of Product Search & Pagination of Product & Status Toggle Switch ------------------------------------------
+
+//------------------------------------ Product Edit in Modal Popup --------------------------------------------
+
+    import EditProductModal from './EditProductModal.vue'
+    
+    const showEditModal = ref(false);
+    const editableProduct = ref({});
+
+    function openEditModal(prod) {
+      editableProduct.value = { ...prod }; // clone to avoid two-way binding side effects
+      showEditModal.value = true;
+    }
+
+    async function updateProduct() {
+      try {
+        // Make your PUT request here to update the product
+        await axios.put(`/api/products/${editableProduct.value.id}`, editableProduct.value);
+        showEditModal.value = false;
+
+        // Refresh product list or update locally
+        const index = products.value.findIndex(p => p.id === editableProduct.value.id);
+        if (index !== -1) {
+          products.value[index] = { ...editableProduct.value };
+        }
+
+        alert('Product updated successfully!');
+      } catch (error) {
+        console.error(error);
+        alert('Update failed.');
+      }
+    }
+
+    function handleProductUpdate(updatedProduct) {
+      const index = products.value.findIndex(p => p.id === updatedProduct.id);
+      if (index !== -1) {
+        products.value[index] = updatedProduct;
+      }
+      showEditModal.value = false;
+    }
+
   </script>
   
   <style scoped>

@@ -71,7 +71,7 @@ public class ProductController {
         return productRepository.save(product);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/product/{id}")
     public Product updateProduct(@PathVariable Integer id, @RequestBody Product product) {
         product.setId(id);
         return productRepository.save(product);
