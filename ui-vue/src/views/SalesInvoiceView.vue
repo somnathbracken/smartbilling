@@ -113,7 +113,7 @@
     const total = invoice.value.items.reduce((sum, item) => {
       return sum + calculateItemTotal(item)
     }, 0)
-    return total - invoice.value.discount
+    return total - (invoice.value.discount || 0)
   })
   
   // Fetch customers and products
@@ -144,6 +144,7 @@
       alert('Error saving invoice!')
     }
   }
+  
   </script>
   
   <style scoped>
