@@ -45,7 +45,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(prod, index) in paginatedProducts.filter(p => p && (p.deleted === false || p.deleted === 'false'))" :key="index" class="text-left">
+        <tr v-for="(prod, index) in paginatedProducts" :key="index" class="text-left">
               <td class="px-4 py-2 border border-gray-200 font-medium text-left">{{ prod.name }}</td>
               <td class="px-4 py-2 border border-gray-200 font-medium text-left">{{ prod.productCode }}</td>
               <td class="px-4 py-2 border border-gray-200 text-right">{{ parseFloat(prod.mrp).toFixed(2) }}</td>
@@ -109,26 +109,6 @@
     }
     onMounted(loadProducts)
 
-    // ------------------------- Product Search & Pagination of Product --------------------
-    const search = ref('');
-    const currentPage = ref(1);
-    const pageSize = 5;
-
-    // Step 1: Filtered products
-    // const filtered = computed(() =>
-    //   products.value.filter(p =>
-    //     p.name.toLowerCase().includes(search.value.toLowerCase())||
-    //     p.productCode.toLowerCase().includes(search.value.toLowerCase())
-    //   )
-    // );
-
-    // Step 2: Paginated products from filtered result
-    const paginatedProducts = computed(() =>
-      filtered.value.slice((currentPage.value - 1) * pageSize, currentPage.value * pageSize)
-    );
-
-    const totalPages = computed(() => Math.ceil(filtered.value.length / pageSize));
-
     // ------------------------ Export to PDF and Excel -------------------
     import * as XLSX from 'xlsx';
     import jsPDF from 'jspdf';
@@ -150,22 +130,37 @@
       doc.save('vendors.pdf')
     }
 
-    //----------------------------------- Status Toggle Switch ------------------------------------------
+    //----------------------------------- Product Search & Pagination of Product & Status Toggle Switch ------------------------------------------
+    const search = ref('');
+    const currentPage = ref(1);
+    const pageSize = 5;
     const showDeleted = ref(false)
-
+    
     const filtered = computed(() => {
+      console.log("Products value:",products.value);
+      console.log("Toggle value:", showDeleted.value);
+      console.log("Filtered result:", filtered.value);
       return products.value.filter(p => {
         const matchesSearch =
-          p.name.toLowerCase().includes(search.value.toLowerCase()) ||
-          p.productCode.toLowerCase().includes(search.value.toLowerCase());
+        p.name.toLowerCase().includes(search.value.toLowerCase())||
+        p.productCode.toLowerCase().includes(search.value.toLowerCase())
 
-        const matchesStatus = showDeleted.value
-          ? p.deleted === true || p.deleted === 'true'
-          : p.deleted === false || p.deleted === 'false';
+        const isDeleted = p.deleted === true || p.deleted === 'true';
+        const isActive = p.deleted === false || p.deleted === 'false';
+
+        const matchesStatus = showDeleted.value ? isDeleted : isActive;
 
         return matchesSearch && matchesStatus;
       });
     });
+
+    const paginatedProducts = computed(() =>
+      filtered.value.slice((currentPage.value - 1) * pageSize, currentPage.value * pageSize)
+    );
+
+    const totalPages = computed(() => Math.ceil(filtered.value.length / pageSize));
+
+//----------------------------------- End of Product Search & Pagination of Product & Status Toggle Switch ------------------------------------------
   </script>
   
   <style scoped>
