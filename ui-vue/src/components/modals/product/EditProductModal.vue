@@ -1,218 +1,182 @@
 <template>
   <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-white w-[90%] max-w-2xl rounded-xl shadow-lg max-h-[90vh] overflow-y-auto p-6 relative">
-      <h2 class="text-xl font-semibold mb-4">Edit Product</h2>
-      <form @submit.prevent="update">
-        <!-- your form fields using localProduct -->
+    <div class="bg-white w-[90%] max-w-6xl rounded-xl shadow-lg max-h-[95vh] overflow-y-auto p-4">
+      <h2 class="text-lg font-semibold mb-4 text-gray-800">Edit Product</h2>
+      <form @submit.prevent="update" class="space-y-6">
 
-
-      <!-- ------------------------------Input Fields Details ----------------------------------------------------- -->
-      <!-- Basic Details -->
-      <div class="col-span-4 text-lg font-semibold mt-4 mb-2">Basic Details</div>
-          <div>
-            <label>Product Code</label>
-            <input v-model="localProduct.productCode" class="input" type="text" />
+        <!-- Basic Details -->
+        <section>
+          <h3 class="text-lg font-semibold border-b pb-1 mb-3">Basic Details</h3>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label>Product Code</label>
+              <input v-model="localProduct.productCode" class="input" type="text" />
+            </div>
+            <div>
+              <label>Product Name</label>
+              <input v-model="localProduct.name" class="input" type="text" />
+            </div>
           </div>
-          <div>
-            <label>Product Name</label>
-            <input v-model="localProduct.name" class="input" type="text" />
-          </div>
+        </section>
 
-          <!-- Inventory Details -->
-          <div class="col-span-4 text-lg font-semibold mt-4 mb-2">Inventory Details</div>
-          <div>
-            <label>Site</label>
-            <div class="flex space-x-2 items-center">
+        <!-- Inventory Info -->
+        <section>
+          <h3 class="text-lg font-semibold border-b pb-1 mb-3">Inventory Info</h3>
+          <div class="grid grid-cols-3 gap-4">
+            <div>
+              <label>Site</label>
               <select v-model="localProduct.siteId" class="input">
                 <option v-for="site in sites" :key="site.id" :value="site.id">{{ site.name }}</option>
               </select>
             </div>
-          </div>
-          <div>
-            <label>Stock Location</label>
-            <div class="flex space-x-2 items-center">
+            <div>
+              <label>Stock Location</label>
               <select v-model="localProduct.stockId" class="input">
                 <option v-for="stock in stocks" :key="stock.id" :value="stock.id">{{ stock.name }}</option>
               </select>
             </div>
-          </div>
-          <div>
-            <label>Warehouse</label>
-            <div class="flex space-x-2 items-center">
+            <div>
+              <label>Warehouse</label>
               <select v-model="localProduct.warehouseId" class="input">
                 <option v-for="warehouse in warehouses" :key="warehouse.id" :value="warehouse.id">{{ warehouse.name }}</option>
               </select>
             </div>
           </div>
-          <!-- Classification -->
-          <div class="col-span-4 text-lg font-semibold mt-4 mb-2">Classification</div>
-          <div>
-            <label>Category</label>
-            <div class="flex items-center space-x-2">
+        </section>
+
+        <!-- Classification -->
+        <section>
+          <h3 class="text-lg font-semibold border-b pb-1 mb-3">Classification</h3>
+          <div class="grid grid-cols-3 gap-4">
+            <div>
+              <label>Category</label>
               <select v-model="localProduct.categoryId" class="input">
                 <option v-for="cat in categories" :key="cat.id" :value="cat.id">{{ cat.name }}</option>
               </select>
             </div>
-          </div>
-          <div>
-            <label>Group</label>
-            <div class="flex items-center space-x-2">
+            <div>
+              <label>Group</label>
               <select v-model="localProduct.groupId" class="input">
                 <option v-for="item in groups" :key="item.id" :value="item.id">{{ item.name }}</option>
               </select>
             </div>
-          </div>
-          <div>
-            <label>Brand</label>
-            <div class="flex items-center space-x-2">
+            <div>
+              <label>Brand</label>
               <select v-model="localProduct.brandId" class="input">
                 <option v-for="item in brands" :key="item.id" :value="item.id">{{ item.name }}</option>
               </select>
             </div>
-          </div>
-          <div>
-            <label>Generic Product</label>
-            <div class="flex items-center space-x-2">
+            <div>
+              <label>Generic Product</label>
               <select v-model="localProduct.genericId" class="input">
                 <option v-for="item in generics" :key="item.id" :value="item.id">{{ item.name }}</option>
               </select>
             </div>
-          </div>
-          <div>
-            <label>UOM</label>
-            <div class="flex space-x-2 items-center">
+            <div>
+              <label>UOM</label>
               <select v-model="localProduct.unitOfMeasure" class="input">
                 <option v-for="uom in uoms" :key="uom.id" :value="uom.id">{{ uom.name }}</option>
               </select>
             </div>
-            </div>
-          <!-- Descriptions -->
-          <div class="col-span-4 text-lg font-semibold mt-4 mb-2">Descriptions</div>
-          <div class="col-span-4">
-            <label>Product Description</label>
-            <textarea v-model="localProduct.description" class="input"></textarea>
           </div>
+        </section>
 
-          <!-- Pricing & SKU -->
-          <div class="col-span-4 text-lg font-semibold mt-4 mb-2">Pricing & SKU</div>
-          <div>
-            <label>Price</label>
-            <input v-model="localProduct.pruchasePrice" class="input" type="number" step="0.01" />
-          </div>
-          <div>
-            <label>MRP</label>
-            <input v-model="localProduct.mrp" class="input" type="number" step="0.01" />
-          </div>
-          <div>
-            <label>Pack Size</label>
-            <input v-model="localProduct.packSize" class="input" type="number" />
-          </div>
-          <div>
-            <label>Quantity</label>
-            <input v-model="localProduct.quantity" class="input" type="number" />
-          </div>          
-          <div>
-            <label>Average Cost</label>
-            <input v-model="localProduct.averageCost" class="input" type="number" step="0.01" />
-          </div>
-          <div>
-            <label>Single Unit Product Code</label>
-            <input v-model="localProduct.singleUnitProductCode" class="input" type="text" />
-          </div>
+        <!-- Description -->
+        <section>
+          <h3 class="text-lg font-semibold border-b pb-1 mb-3">Description</h3>
+          <textarea v-model="localProduct.description" class="input w-full h-24 resize-y" placeholder="Enter product description here..."></textarea>
+        </section>
 
-          <!-- Tax & Compliance -->
-          <div class="col-span-4 text-lg font-semibold mt-4 mb-2">Tax & Compliance</div>
-          <div>
-            <label>HSN Code</label>
-            <input v-model="localProduct.hsnCode" class="input" type="text" />
+        <!-- Pricing -->
+        <section>
+          <h3 class="text-lg font-semibold border-b pb-1 mb-3">Pricing & SKU</h3>
+          <div class="grid grid-cols-3 gap-4">
+            <div><label>Purchase Price</label><input v-model="localProduct.pruchasePrice" class="input" type="number" step="0.01" /></div>
+            <div><label>MRP</label><input v-model="localProduct.mrp" class="input" type="number" step="0.01" /></div>
+            <div><label>Pack Size</label><input v-model="localProduct.packSize" class="input" type="number" /></div>
+            <div><label>Quantity</label><input v-model="localProduct.quantity" class="input" type="number" /></div>
+            <div><label>Average Cost</label><input v-model="localProduct.averageCost" class="input" type="number" step="0.01" /></div>
+            <div><label>Single Unit Code</label><input v-model="localProduct.singleUnitProductCode" class="input" type="text" /></div>
           </div>
-          <div>
-            <label>HSN Description</label>
-            <input v-model="localProduct.hsnDescription" class="input" type="text" />
-          </div>
-          <div>
-            <label>Model/Part ID</label>
-            <input v-model="localProduct.modelId" class="input" type="text" />
-          </div>
-          <div>
-            <label>Warranty Terms</label>
-            <input v-model="localProduct.warrantyTerms" class="input" type="text" />
-          </div>
-          <div>
-            <label>Product Lot</label>
-            <div class="flex items-center space-x-2">
+        </section>
+
+        <!-- Tax & Compliance -->
+        <section>
+          <h3 class="text-lg font-semibold border-b pb-1 mb-3">Tax & Compliance</h3>
+          <div class="grid grid-cols-3 gap-4">
+            <div><label>HSN Code</label><input v-model="localProduct.hsnCode" class="input" type="text" /></div>
+            <div><label>HSN Description</label><input v-model="localProduct.hsnDescription" class="input" type="text" /></div>
+            <div><label>Model/Part ID</label><input v-model="localProduct.modelId" class="input" type="text" /></div>
+            <div><label>Warranty Terms</label><input v-model="localProduct.warrantyTerms" class="input" type="text" /></div>
+            <div>
+              <label>Product Lot</label>
               <select v-model="localProduct.productLotId" class="input">
-                <option v-for="lot in productLots" :key="lot.id" :value="lot.id">
-                  {{ lot.lot_code }} (MFG: {{ lot.dateManufactured }} / EXP: {{ lot.dateExpiry }})
-                </option>
+                <option v-for="lot in productLots" :key="lot.id" :value="lot.id">{{ lot.lot_code }} (MFG: {{ lot.dateManufactured }} / EXP: {{ lot.dateExpiry }})</option>
               </select>
             </div>
-          </div>
-
-          <div>
-            <label>GST Tax</label>
-            <div class="flex items-center space-x-2">
+            <div>
+              <label>GST</label>
               <select v-model="localProduct.gstPercentage" class="input">
                 <option v-for="gst in gstTaxes" :key="gst.id" :value="gst.id">{{ gst.name }} ({{ gst.percentage }}%)</option>
               </select>
             </div>
           </div>
-          <!-- Associations -->
-          <div class="col-span-4 text-lg font-semibold mt-4 mb-2">Associations</div>
-          <div>
-            <!-- <label>Supplier</label>
-            <select v-model="localProduct.supplierId" class="input">
-              <option value="">Select Supplier</option>
-              <option v-for="supplier in suppliers" :key="supplier.id" :value="supplier.id">{{ supplier.name }}</option>
-            </select> -->
-            <label for="vendor">Vendor</label>
-            <select v-model="localProduct.vendorId" class="form-select border p-2 rounded w-full">
-              <option disabled value="">Select Vendor</option>
-              <option v-for="vendor in vendors" :key="vendor.id" :value="vendor.id">
-                {{ vendor.name }}
-              </option>
-            </select>
-          </div>
-          <div>
-            <label>Purchase Order</label>
-            <select v-model="localProduct.purchaseOrderId" class="input">
-              <option value="">Select Purchase Order</option>
-              <option v-for="po in purchaseOrders" :key="po.id" :value="po.id">{{ po.name }}</option>
-            </select>
-          </div>
-          <div>
-            <label>Product Attribute</label>
-            <select v-model="localProduct.productAttributeId" class="input">
-              <option value="">Select Attribute</option>
-              <option v-for="attr in productAttributes" :key="attr.id" :value="attr.id">{{ attr.name }}</option>
-            </select>
-          </div>
+        </section>
 
-          <!-- Discounts -->
-          <div class="col-span-4 text-lg font-semibold mt-4 mb-2">Discounts</div>
-          <div>
-            <label>Discounts(%)</label>
-            <input v-model="localProduct.discounts" class="input" type="number" step="0.01" />
+        <!-- Associations -->
+        <section>
+          <h3 class="text-lg font-semibold border-b pb-1 mb-3">Associations</h3>
+          <div class="grid grid-cols-3 gap-4">
+            <div>
+              <label>Vendor</label>
+              <select v-model="localProduct.vendorId" class="input">
+                <option disabled value="">Select Vendor</option>
+                <option v-for="vendor in vendors" :key="vendor.id" :value="vendor.id">{{ vendor.name }}</option>
+              </select>
+            </div>
+            <div>
+              <label>Purchase Order</label>
+              <select v-model="localProduct.purchaseOrderId" class="input">
+                <option value="">Select PO</option>
+                <option v-for="po in purchaseOrders" :key="po.id" :value="po.id">{{ po.name }}</option>
+              </select>
+            </div>
+            <div>
+              <label>Product Attribute</label>
+              <select v-model="localProduct.productAttributeId" class="input">
+                <option value="">Select Attribute</option>
+                <option v-for="attr in productAttributes" :key="attr.id" :value="attr.id">{{ attr.name }}</option>
+              </select>
+            </div>
           </div>
+        </section>
 
-          <!-- Flags & Status -->
-          <div class="col-span-4 text-lg font-semibold mt-4 mb-2">Flags & Status</div>
-          <div class="flex items-center">
-            <label class="mr-2">Is Active</label>
-            <input type="checkbox" v-model="localProduct.isActive" />
+        <!-- Flags & Discounts -->
+        <section>
+          <h3 class="text-lg font-semibold border-b pb-1 mb-3">Discounts & Status</h3>
+          <div class="grid grid-cols-3 gap-4 items-center">
+            <div>
+              <label>Discount (%)</label>
+              <input v-model="localProduct.discounts" class="input" type="number" step="0.01" />
+            </div>
+            <div class="col-span-1 flex items-center space-x-2 mt-6">
+              <label for="isActive">Is Active</label>
+              <input type="checkbox" v-model="localProduct.isActive" />
+            </div>
           </div>
-        <!-- ----------------------------------------------------------------------------------- -->
+        </section>
 
-
-        <!-- other fields -->
-        <div class="mt-6 flex justify-end space-x-3">
-          <button type="button" class="btn-red" @click="$emit('close')">Cancel</button>
-          <button type="submit" class="btn">Update</button>
+        <!-- Actions -->
+        <div class="flex justify-end space-x-4 mt-8">
+          <button type="submit" class="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700">Update</button>
+          <button type="button" class="px-4 py-2 rounded bg-red-500 text-white hover:bg-red-600" @click="$emit('close')">Cancel</button>
         </div>
       </form>
     </div>
   </div>
 </template>
+
+
 
 <script setup>
 import { ref, toRaw, onMounted } from 'vue'
@@ -419,11 +383,14 @@ onMounted(async () => {
 // --------------------------------------------- Dropdown loading Finished ------------------------------------
 </script>
 <style>
-  .input {
-  @apply border border-gray-300 px-3 py-1.5 text-sm rounded-md w-full 
-         bg-white shadow-inner focus:outline-none focus:ring-2 
-         focus:ring-blue-300 focus:border-blue-400 
-         transition duration-200 ease-in-out;
+.input {
+  @apply w-full text-sm p-2 rounded border border-gray-300 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-300;
+}
+.label {
+  @apply text-xs text-gray-600 font-medium mb-1 block;
+}
+.section-title {
+  @apply col-span-3 text-sm font-semibold text-blue-700 mb-2 mt-4;
 }
 
 .btn {
