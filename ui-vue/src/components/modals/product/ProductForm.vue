@@ -228,8 +228,8 @@
           </div>
 
           <!-- Actions -->
-          <div class="col-span-4 flex justify-end space-x-4 mt-6">
-            <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700">Save Product</button>
+          <div class="col-span-4 flex justify-end space-x-4 mt-6 space-x-2">
+            <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700">Save</button>
             <button type="button" @click="resetForm" class="bg-gray-500 text-white px-6 py-2 rounded hover:bg-gray-600">Reset</button>
           </div>
         <!-- ----------------------------------------------------------------------------------- -->

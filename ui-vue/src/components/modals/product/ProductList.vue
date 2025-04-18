@@ -19,9 +19,9 @@
               <td class="px-4 py-2 border border-gray-200 font-medium text-left">{{ prod.productCode }}</td>
               <td class="px-4 py-2 border border-gray-200 text-right">{{ parseFloat(prod.mrp).toFixed(2) }}</td>
               <td class="px-4 py-2 border border-gray-200 text-right">{{ prod.quantity }}</td>
-              <td class="px-4 py-2 border border-gray-200 text-center">
-                <button @click="editProduct(prod)" class="text-blue-600 hover:underline mr-2">Edit</button>
-                <button @click="deleteProduct(prod.id)" class="text-red-600 hover:underline">Delete</button>
+              <td class="px-4 py-2 border border-gray-200 text-center space-x-2">
+                <button @click="editProduct(prod)" class="btn-primary-sm">Edit</button>
+                <button @click="deleteProduct(prod.id)" class="btn-danger-sm">Delete</button>
               </td>
             </tr>
       </tbody>
@@ -63,14 +63,28 @@
   </script>
   
   <style scoped>
-.btn {
-  @apply bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 transition duration-150;
+/* Add these to your tailwind base layer or a global style file */
+.input-style {
+  @apply border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm;
 }
-
-.btn-red {
-  @apply bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition duration-150;
+.btn-primary {
+  @apply bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 text-sm font-medium;
 }
-
+.btn-secondary {
+  @apply bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300 text-sm font-medium;
+}
+.btn-primary-sm {
+  @apply bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 text-xs;
+}
+.btn-danger-sm {
+  @apply bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 text-xs;
+}
+.btn-success {
+  @apply bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 text-sm font-medium;
+}
+.btn-warning {
+  @apply bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 text-sm font-medium;
+}
 
   </style>
   
