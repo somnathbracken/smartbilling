@@ -1,171 +1,154 @@
 <template>
-    <div class="p-6 space-y-4">
-      <!-- Invoice Header -->
-      <div class="grid grid-cols-2 gap-4">
-        <div>
-          <label class="block text-sm font-medium">Invoice Number</label>
-          <input v-model="invoice.invoiceNumber" class="w-full border rounded p-2" type="text" />
-        </div>
-        <div>
-          <label class="block text-sm font-medium">Invoice Date</label>
-          <input v-model="invoice.invoiceDate" class="w-full border rounded p-2" type="date" />
-        </div>
-        <div>
-          <label class="block text-sm font-medium">Customer</label>
-          <select v-model="invoice.customerId" class="w-full border rounded p-2">
-            <option v-for="customer in customers" :key="customer.id" :value="customer.id">
-              {{ customer.name }}
-            </option>
-          </select>
-          <button class="text-sm text-blue-600 underline mt-1" @click="openCustomerModal">+ Add Customer</button>
-        </div>
-        <div>
-          <label class="block text-sm font-medium">Billing Address</label>
-          <textarea v-model="invoice.billingAddress" class="w-full border rounded p-2"></textarea>
-        </div>
-        <div>
-          <label class="block text-sm font-medium">Shipping Address</label>
-          <textarea v-model="invoice.shippingAddress" class="w-full border rounded p-2"></textarea>
-        </div>
+    <div class="p-6">
+      <h2 class="text-2xl font-bold mb-4">Create Sales Invoice</h2>
+  
+      <!-- Customer Selection -->
+      <div class="mb-4">
+        <label class="block font-medium mb-1">Customer</label>
+        <select v-model="invoice.customer.id" class="border rounded p-2 w-full">
+          <option value="" disabled>Select Customer</option>
+          <option v-for="cust in customers" :key="cust.id" :value="cust.id">{{ cust.name }}</option>
+        </select>
       </div>
   
-      <!-- Product Line Items -->
-      <div class="mt-6">
-        <table class="min-w-full table-auto border border-gray-200">
-          <thead>
-            <tr class="bg-gray-100">
+      <!-- Invoice Date -->
+      <div class="mb-4">
+        <label class="block font-medium mb-1">Invoice Date</label>
+        <input type="date" v-model="invoice.invoiceDate" class="border rounded p-2 w-full" />
+      </div>
+  
+      <!-- Items Table -->
+      <div class="mb-4">
+        <h3 class="font-semibold mb-2">Invoice Items</h3>
+        <table class="w-full border">
+          <thead class="bg-gray-100">
+            <tr>
               <th class="p-2 border">Product</th>
-              <th class="p-2 border">Qty</th>
+              <th class="p-2 border">Quantity</th>
               <th class="p-2 border">Unit Price</th>
               <th class="p-2 border">GST %</th>
-              <th class="p-2 border">Discount %</th>
+              <th class="p-2 border">Discount</th>
               <th class="p-2 border">Total</th>
-              <th class="p-2 border">Actions</th>
+              <th class="p-2 border"></th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="(item, index) in invoice.items" :key="index">
-              <td class="p-2 border">
-                <select v-model="item.productId" class="w-full border rounded p-1">
-                  <option v-for="product in products" :key="product.id" :value="product.id">
-                    {{ product.name }}
-                  </option>
+              <td>
+                <select v-model="item.product.id" class="p-2 border">
+                  <option value="">Select</option>
+                  <option v-for="p in products" :key="p.id" :value="p.id">{{ p.name }}</option>
                 </select>
               </td>
-              <td class="p-2 border"><input type="number" v-model.number="item.quantity" class="w-full p-1 border rounded" /></td>
-              <td class="p-2 border"><input type="number" v-model.number="item.unitPrice" class="w-full p-1 border rounded" /></td>
-              <td class="p-2 border"><input type="number" v-model.number="item.gstPercentage" class="w-full p-1 border rounded" /></td>
-              <td class="p-2 border"><input type="number" v-model.number="item.discountPercentage" class="w-full p-1 border rounded" /></td>
-              <td class="p-2 border">{{ calculateItemTotal(item) }}</td>
-              <td class="p-2 border text-center">
-                <button @click="removeItem(index)" class="text-red-600 font-bold">&times;</button>
+              <td><input type="number" v-model.number="item.quantity" class="p-2 border w-20" /></td>
+              <td><input type="number" v-model.number="item.unitPrice" class="p-2 border w-24" /></td>
+              <td><input type="number" v-model.number="item.gstPercentage" class="p-2 border w-16" /></td>
+              <td><input type="number" v-model.number="item.discount" class="p-2 border w-20" /></td>
+              <td class="text-right pr-4">{{ calculateItemTotal(item).toFixed(2) }}</td>
+              <td>
+                <button @click="removeItem(index)" class="text-red-600 hover:underline">Remove</button>
               </td>
             </tr>
           </tbody>
         </table>
-        <button class="mt-2 text-blue-600 underline" @click="addItem">+ Add Line Item</button>
+        <button @click="addItem" class="mt-2 bg-blue-500 text-white px-3 py-1 rounded">+ Add Item</button>
       </div>
   
-      <!-- Summary Section -->
-      <div class="grid grid-cols-3 justify-end mt-4">
-        <div></div>
-        <div></div>
-        <div class="space-y-2">
-          <div class="flex justify-between">
-            <span>Subtotal:</span>
-            <span>{{ subtotal }}</span>
-          </div>
-          <div class="flex justify-between">
-            <span>GST Total:</span>
-            <span>{{ gstTotal }}</span>
-          </div>
-          <div class="flex justify-between">
-            <span>Discount Total:</span>
-            <span>{{ discountTotal }}</span>
-          </div>
-          <div class="flex justify-between font-bold">
-            <span>Grand Total:</span>
-            <span>{{ grandTotal }}</span>
-          </div>
-        </div>
+      <!-- Summary -->
+      <div class="mb-4 flex justify-between">
+        <div>Total GST: ₹{{ totalGST.toFixed(2) }}</div>
+        <div>Discount: ₹{{ invoice.discount.toFixed(2) }}</div>
+        <div><strong>Grand Total: ₹{{ grandTotal.toFixed(2) }}</strong></div>
       </div>
   
-      <!-- Action Buttons -->
-      <div class="mt-6 space-x-4">
-        <button class="bg-blue-600 text-white px-4 py-2 rounded">Save</button>
-        <button class="bg-green-600 text-white px-4 py-2 rounded">Print</button>
-        <button class="bg-indigo-600 text-white px-4 py-2 rounded">Export PDF</button>
-        <button class="bg-gray-500 text-white px-4 py-2 rounded">Cancel</button>
-      </div>
-  
-      <!-- Customer & Product Modal Templates (Placeholder) -->
-      <!-- Add your modal components here -->
+      <!-- Submit Button -->
+      <button @click="submitInvoice" class="bg-green-600 text-white px-4 py-2 rounded">Save Invoice</button>
     </div>
   </template>
   
   <script setup>
-  import { reactive, ref, computed } from 'vue'
+  import { ref, onMounted, computed } from 'vue'
+  import axios from 'axios'
   
-  const invoice = reactive({
-    invoiceNumber: '',
-    invoiceDate: new Date().toISOString().substr(0, 10),
-    customerId: null,
-    billingAddress: '',
-    shippingAddress: '',
+  // Reactive invoice data
+  const invoice = ref({
+    customer: { id: '' },
+    invoiceDate: new Date().toISOString().substring(0, 10),
+    discount: 0,
     items: []
   })
   
-  const customers = ref([{ id: 1, name: 'ABC Corp' }, { id: 2, name: 'XYZ Ltd' }])
-  const products = ref([{ id: 1, name: 'Widget A' }, { id: 2, name: 'Gadget B' }])
+  const customers = ref([])
+  const products = ref([])
   
-  function addItem() {
-    invoice.items.push({ productId: null, quantity: 1, unitPrice: 0, gstPercentage: 0, discountPercentage: 0 })
+  const addItem = () => {
+    invoice.value.items.push({
+      product: { id: '' },
+      quantity: 1,
+      unitPrice: 0,
+      gstPercentage: 0,
+      discount: 0
+    })
   }
   
-  function removeItem(index) {
-    invoice.items.splice(index, 1)
+  const removeItem = (index) => {
+    invoice.value.items.splice(index, 1)
   }
   
-  function calculateItemTotal(item) {
-    const base = item.quantity * item.unitPrice
-    const gst = (base * item.gstPercentage) / 100
-    const discount = (base * item.discountPercentage) / 100
-    return (base + gst - discount).toFixed(2)
+  const calculateItemTotal = (item) => {
+    const subtotal = item.quantity * item.unitPrice
+    const gst = (subtotal * item.gstPercentage) / 100
+    const discount = item.discount || 0
+    return subtotal + gst - discount
   }
   
-  const subtotal = computed(() => {
-    return invoice.items.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0).toFixed(2)
-  })
-  
-  const gstTotal = computed(() => {
-    return invoice.items.reduce((sum, item) => sum + (item.quantity * item.unitPrice * item.gstPercentage) / 100, 0).toFixed(2)
-  })
-  
-  const discountTotal = computed(() => {
-    return invoice.items.reduce((sum, item) => sum + (item.quantity * item.unitPrice * item.discountPercentage) / 100, 0).toFixed(2)
-  })
+  const totalGST = computed(() =>
+    invoice.value.items.reduce((sum, item) => {
+      const gst = (item.quantity * item.unitPrice * item.gstPercentage) / 100
+      return sum + gst
+    }, 0)
+  )
   
   const grandTotal = computed(() => {
-    return invoice.items.reduce((sum, item) => {
-      const base = item.quantity * item.unitPrice
-      const gst = (base * item.gstPercentage) / 100
-      const discount = (base * item.discountPercentage) / 100
-      return sum + base + gst - discount
-    }, 0).toFixed(2)
+    const total = invoice.value.items.reduce((sum, item) => {
+      return sum + calculateItemTotal(item)
+    }, 0)
+    return total - invoice.value.discount
   })
   
-  function openCustomerModal() {
-    // Placeholder for customer modal logic
-  }
+  // Fetch customers and products
+  onMounted(async () => {
+    customers.value = (await axios.get('http://localhost:8080/api/customers/listAll')).data
+    products.value = (await axios.get('http://localhost:8082/api/products')).data
+  })
   
-  function openProductModal() {
-    // Placeholder for product modal logic
+  // Submit to backend
+  const submitInvoice = async () => {
+    const payload = {
+      ...invoice.value,
+      totalGST: totalGST.value,
+      grandTotal: grandTotal.value
+    }
+  
+    try {
+      await axios.post('http://localhost:8083/api/salesinvoices', payload)
+      alert('Invoice saved successfully!')
+      invoice.value = {
+        customer: { id: '' },
+        invoiceDate: new Date().toISOString().substring(0, 10),
+        discount: 0,
+        items: []
+      }
+    } catch (err) {
+      console.error(err)
+      alert('Error saving invoice!')
+    }
   }
   </script>
   
   <style scoped>
-  textarea {
-    min-height: 60px;
+  table, th, td {
+    border-collapse: collapse;
   }
   </style>
   
