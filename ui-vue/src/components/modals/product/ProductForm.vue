@@ -595,11 +595,25 @@ const resetForm = () => {
   </script>
   
   <style scoped>
+  /* Tailwind enhanced utility classes */
   .input {
-    @apply border p-2 rounded w-full;
-  }
-  .btn {
-    @apply bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600;
-  }
+  @apply border border-gray-300 px-3 py-1.5 text-sm rounded-md w-full 
+         bg-white shadow-inner focus:outline-none focus:ring-2 
+         focus:ring-blue-300 focus:border-blue-400 
+         transition duration-200 ease-in-out;
+}
+
+.btn {
+  @apply bg-gradient-to-r from-blue-500 to-blue-600 text-white text-sm 
+         px-4 py-1.5 rounded-md hover:from-blue-600 hover:to-blue-700 
+         active:from-blue-700 active:to-blue-800 shadow-md 
+         transition duration-200 ease-in-out;
+}
+.select {
+  @apply border border-gray-300 px-3 py-1.5 text-sm rounded-md w-full 
+         bg-white shadow-inner focus:outline-none focus:ring-2 
+         focus:ring-blue-300 focus:border-blue-400 
+         transition duration-200 ease-in-out appearance-none;
+}
   </style>
   
