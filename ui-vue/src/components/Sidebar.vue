@@ -17,11 +17,11 @@ const menuItems = [
   { name: 'Customers', route: '/customers' },
   { name: 'Vendors', route: '/vendors' },
   { name: 'Products', route: '/products' },
+  { name: 'Sales Invoice', route: '/invoice' },  
   { name: 'Stock Journal', route: '/stocks' },
   // { name: 'Delivery Challan', route: '/deliveryChallan' },
   // { name: 'Sales Order', route: '/delivery' },
   // { name: 'Purchase Order', route: '/purchase' },
-  { name: 'Sales Invoice', route: '/sale' },
   { name: 'Reports', route: '/reports' },
   { name: 'Logout', route: '/logout' }
 ];
