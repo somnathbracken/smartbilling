@@ -1,4 +1,5 @@
 <template>
+  <div :key="componentKey">
   <div class="p-6">
         <!-- Toggle Button -->
         <div class="mb-4">
@@ -23,7 +24,7 @@
 <div class="col-span-4 text-lg font-semibold mt-4 mb-2">Basic Details</div>
 <div>
   <label>Product Code</label>
-  <input v-model="product.product_code" class="input" type="text" />
+  <input v-model="product.productcode" class="input" type="text" />
 </div>
 <div>
   <label>Product Name</label>
@@ -237,12 +238,10 @@
 </div>
 
 <!-- Actions -->
-<div class="col-span-2 text-right mt-4">
-  <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
-    Save Product
-  </button>
+<div class="col-span-4 flex justify-end space-x-4 mt-6">
+  <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700">Save Product</button>
+  <button type="button" @click="resetForm" class="bg-gray-500 text-white px-6 py-2 rounded hover:bg-gray-600">Reset</button>
 </div>
-
 </form>
 </div>
 
@@ -278,6 +277,7 @@
 
 </div>
 
+</div> 
 
 <!-- ===================   Starting Modal Definition =================== -->
 
@@ -383,7 +383,7 @@
 
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import axios from 'axios'
 
 import CategoryModal from '../components/modals/product/CategoryModal.vue'
@@ -398,7 +398,7 @@ import StockModal from '../components/modals/product/StockModal.vue'
 import WarehouseModal from '../components/modals/product/WarehouseModal.vue'
 import UomModal from '../components/modals/product/UomModal.vue'
 
-import { getAllBrands, getAllCategories, getAllGroups, getAllSites, getAllStocks, getAllUoms, getAllWarehouses, getAllGenericProducts, getAllTaxes, getAllProductLots, getAllVendors } from '../services/ProductService';
+import { createProduct, getAllProducts, getAllBrands, getAllCategories, getAllGroups, getAllSites, getAllStocks, getAllUoms, getAllWarehouses, getAllGenericProducts, getAllTaxes, getAllProductLots, getAllVendors } from '../services/ProductService';
 
 const showSiteModal = ref(false)
 const showStockModal = ref(false)
@@ -611,7 +611,7 @@ const products = ref([])
 const showForm = ref(false)
 const selectedProduct = ref(null)
 const product = ref({
-  product_code: '',
+  productcode: '',
   product_name: '',
   site_id: null,
   stock_id: null,
@@ -637,15 +637,24 @@ const product = ref({
   productAttributeId: null,
   product_discounts: 0
 })
-const form = ref({
-  name: '',
-  sku: '',
-  unit_price: 0,
-  quantity: 0,
-})
+// const form = ref({
+//   name: '',
+//   productCode: '',
+//   sku: '',
+//   siteId: '',
+//   unit_price: 0,
+//   quantity: 0,
+// })
 
 const loadProducts = async () => {
-  products.value = await getAllProducts()
+  try {
+    const res = await getAllProducts()
+    // Make sure it's an array
+    products.value = Array.isArray(res.data) ? res.data : []
+  } catch (err) {
+    console.error('Failed to load products:', err)
+    products.value = []
+  }
 }
 
 const toggleForm = () => {
@@ -659,29 +668,50 @@ const editProduct = (product) => {
   showForm.value = true
 }
 
-const resetForm = () => {
-  selectedProduct.value = null
-  form.value = {
-    name: '',
-    sku: '',
-    unit_price: 0,
-    quantity: 0,
-  }
-}
-
 // const saveProduct = async () => {
-//   await saveOrUpdateProduct(form.value)
+//   alert('Saving Product!')
+//   await createProduct(product.value)
+//   if (product.value.id) {
+//       await createProduct(product.value.id, product.value)
+//     } else {
+//       await createProduct(product.value)
+//     }
 //   await loadProducts()
 //   resetForm()
 //   showForm.value = false
+//   alert('Product saved!')
 // }
+
+const saveProduct = async () => {
+  alert('Saving Product!')
+  console.log("Saving Product:", JSON.stringify(product.value, null, 2))
+
+  if (product.value.id) {
+    // Update existing product
+    await updateProduct(product.value.id, product.value)
+  } else {
+    // Create new product
+    await createProduct(product.value)
+  }
+
+  await loadProducts()
+  resetForm()
+  showForm.value = false
+  alert('Product saved!')
+}
+
+const resetForm = () => {
+  product.value = { productcode: '' }
+}
 
 // const deleteProduct = async (id) => {
 //   await deleteProductById(id)
 //   await loadProducts()
 // }
 
-// onMounted(loadProducts)
+onMounted(loadProducts)
+
+//const componentKey = ref(0)
 
 </script>
 
