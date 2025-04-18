@@ -1,6 +1,7 @@
 package com.smartbill.productservice.controller;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -76,9 +77,11 @@ public class ProductController {
         return productRepository.save(product);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/product/{id}")
     public void deleteProduct(@PathVariable Integer id) {
-        productRepository.deleteById(id);
+         Product product = productRepository.findById(id).get();
+         product.setDeleted(true);
+        productRepository.save(product);
     }
 
     @GetMapping("/{id}")

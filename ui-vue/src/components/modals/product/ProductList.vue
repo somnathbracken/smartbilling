@@ -7,31 +7,31 @@
         <thead class="bg-gray-100">
           <tr>
             <th class="px-4 py-2 border">Name</th>
-            <th class="px-4 py-2 border">SKU</th>
-            <th class="px-4 py-2 border">Price</th>
+            <th class="px-4 py-2 border">Product Code</th>
+            <th class="px-4 py-2 border">MRP</th>
             <th class="px-4 py-2 border">Qty</th>
             <th class="px-4 py-2 border">Actions</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(prod, index) in products" :key="index" class="text-center">
-            <td class="border px-4 py-2">{{ prod.name }}</td>
-            <td class="border px-4 py-2">{{ prod.sku }}</td>
-            <td class="border px-4 py-2">{{ prod.unit_price }}</td>
-            <td class="border px-4 py-2">{{ prod.quantity }}</td>
-            <td class="border px-4 py-2">
-              <button @click="editProduct(prod)" class="text-blue-600 hover:underline mr-2">Edit</button>
-              <button @click="deleteProduct(prod.id)" class="text-red-600 hover:underline">Delete</button>
-            </td>
-          </tr>
+          <tr v-for="(prod, index) in products.filter(p => p && (p.deleted === false || p.deleted === 'false'))" :key="index" class="text-center">
+              <td class="border px-4 py-2">{{ prod.name }}</td>
+              <td class="border px-4 py-2">{{ prod.productCode }}</td>
+              <td class="border px-4 py-2">{{ prod.mrp }}</td>
+              <td class="border px-4 py-2">{{ prod.quantity }}</td>
+              <td class="border px-4 py-2">
+                <button @click="editProduct(prod)" class="text-blue-600 hover:underline mr-2">Edit</button>
+                <button @click="deleteProduct(prod.id)" class="text-red-600 hover:underline">Delete</button>
+              </td>
+            </tr>
         </tbody>
       </table>
     </div>
   </template>
   
   <script setup>
-  import { ref, onMounted } from 'vue'
-  import { getAllProducts } from '../../../services/ProductService';
+  import { ref, onMounted, computed } from 'vue'
+  import { getAllProducts, deleteProductById } from '../../../services/ProductService';
   //import axios from 'axios'
   defineProps(['products'])
   const emit = defineEmits(['edit-product', 'delete-product'])
@@ -47,16 +47,17 @@
         products.value = []
       }
     }
+    
     const editProduct = (product) => {
       form.value = { ...product }
       selectedProduct.value = product
       showForm.value = true
     }
     
-    // const deleteProduct = async (id) => {
-    //   await deleteProductById(id)
-    //   await loadProducts()
-    // }
+    const deleteProduct = async (id) => {
+      await deleteProductById(id)
+      await loadProducts()
+    }
     onMounted(loadProducts)
   </script>
   
