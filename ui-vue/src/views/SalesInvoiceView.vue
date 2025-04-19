@@ -1,155 +1,136 @@
 <template>
-    <div class="p-6">
-      <h2 class="text-2xl font-bold mb-4">Create Sales Invoice</h2>
-  
-      <!-- Customer Selection -->
-      <div class="mb-4">
-        <label class="block font-medium mb-1">Customer</label>
-        <select v-model="invoice.customer.id" class="border rounded p-2 w-full">
-          <option value="" disabled>Select Customer</option>
-          <option v-for="cust in customers" :key="cust.id" :value="cust.id">{{ cust.name }}</option>
-        </select>
+<!-- Customer Search Section -->
+<div class="mb-4 w-full">
+  <label class="block font-semibold mb-1">Customer</label>
+  <div class="relative w-full">
+    <input
+      v-model="customerQuery"
+      @input="searchCustomer"
+      placeholder="Search Customer by Name or Phone"
+      class="border p-2 w-full rounded"
+    />
+    <!-- Customer Suggestions -->
+    <ul v-if="showSuggestions && filteredCustomers.length" class="absolute z-10 bg-white border w-full max-h-48 overflow-y-auto">
+      <li
+        v-for="(customer, index) in filteredCustomers"
+        :key="index"
+        @click="selectCustomer(customer)"
+        class="p-2 hover:bg-blue-100 cursor-pointer"
+      >
+        {{ customer.name }} - {{ customer.phone }}
+      </li>
+    </ul>
+
+    <!-- Add new customer if not found -->
+    <div v-if="showSuggestions && !filteredCustomers.length" class="absolute z-10 bg-white border w-full">
+      <div class="p-2 text-gray-500">
+        No match found.
+        <button @click="showCustomerModal = true" class="ml-2 text-blue-600 underline">Add New</button>
       </div>
-  
-      <!-- Invoice Date -->
-      <div class="mb-4">
-        <label class="block font-medium mb-1">Invoice Date</label>
-        <input type="date" v-model="invoice.invoiceDate" class="border rounded p-2 w-full" />
-      </div>
-  
-      <!-- Items Table -->
-      <div class="mb-4">
-        <h3 class="font-semibold mb-2">Invoice Items</h3>
-        <table class="w-full border">
-          <thead class="bg-gray-100">
-            <tr>
-              <th class="p-2 border">Product</th>
-              <th class="p-2 border">Quantity</th>
-              <th class="p-2 border">Unit Price</th>
-              <th class="p-2 border">GST %</th>
-              <th class="p-2 border">Discount</th>
-              <th class="p-2 border">Total</th>
-              <th class="p-2 border"></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(item, index) in invoice.items" :key="index">
-              <td>
-                <select v-model="item.product.id" class="p-2 border">
-                  <option value="">Select</option>
-                  <option v-for="p in products" :key="p.id" :value="p.id">{{ p.name }}</option>
-                </select>
-              </td>
-              <td><input type="number" v-model.number="item.quantity" class="p-2 border w-20" /></td>
-              <td><input type="number" v-model.number="item.unitPrice" class="p-2 border w-24" /></td>
-              <td><input type="number" v-model.number="item.gstPercentage" class="p-2 border w-16" /></td>
-              <td><input type="number" v-model.number="item.discount" class="p-2 border w-20" /></td>
-              <td class="text-right pr-4">{{ calculateItemTotal(item).toFixed(2) }}</td>
-              <td>
-                <button @click="removeItem(index)" class="text-red-600 hover:underline">Remove</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        <button @click="addItem" class="mt-2 bg-blue-500 text-white px-3 py-1 rounded">+ Add Item</button>
-      </div>
-  
-      <!-- Summary -->
-      <div class="mb-4 flex justify-between">
-        <div>Total GST: ₹{{ totalGST.toFixed(2) }}</div>
-        <div>Discount: ₹{{ invoice.discount.toFixed(2) }}</div>
-        <div><strong>Grand Total: ₹{{ grandTotal.toFixed(2) }}</strong></div>
-      </div>
-  
-      <!-- Submit Button -->
-      <button @click="submitInvoice" class="bg-green-600 text-white px-4 py-2 rounded">Save Invoice</button>
     </div>
-  </template>
-  
-  <script setup>
-  import { ref, onMounted, computed } from 'vue'
-  import axios from 'axios'
-  
-  // Reactive invoice data
-  const invoice = ref({
-    customer: { id: '' },
-    invoiceDate: new Date().toISOString().substring(0, 10),
-    discount: 0,
-    items: []
-  })
-  
-  const customers = ref([])
-  const products = ref([])
-  
-  const addItem = () => {
-    invoice.value.items.push({
-      product: { id: '' },
-      quantity: 1,
-      unitPrice: 0,
-      gstPercentage: 0,
-      discount: 0
-    })
+  </div>
+</div>
+
+<!-- Add Customer Modal -->
+<div v-if="showCustomerModal" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+  <div class="bg-white p-6 rounded shadow-lg w-96">
+    <h3 class="text-lg font-bold mb-4">Add New Customer</h3>
+    <input v-model="newCustomer.name" placeholder="Customer Name" class="border p-2 w-full mb-2" />
+    <input v-model="newCustomer.phone" placeholder="Phone Number" class="border p-2 w-full mb-2" />
+    <div class="flex justify-end mt-4">
+      <button @click="saveCustomer" class="bg-blue-600 text-white px-4 py-2 rounded mr-2">Save</button>
+      <button @click="showCustomerModal = false" class="bg-gray-400 text-white px-4 py-2 rounded">Cancel</button>
+    </div>
+  </div>
+</div>
+<!-- Invoice Date -->
+<div class="mb-4 w-full sm:w-1/2">
+  <label class="block font-semibold mb-1">Invoice Date</label>
+  <Datepicker
+    v-model="invoice.invoiceDate"
+    :format="'yyyy-MM-dd'"
+    :enable-time-picker="false"
+    :clearable="false"
+    class="w-full"
+  />
+</div>
+
+</template>
+<script setup>
+import { ref } from 'vue';
+const invoice = ref({
+  invoiceDate: new Date().toISOString().substring(0, 10), // default to today
+  customer: null,
+  invoiceDate: new Date(),
+  items: []
+});
+// Reactive state
+const customerQuery = ref('');
+const filteredCustomers = ref([]);
+const showSuggestions = ref(false);
+const showCustomerModal = ref(false);
+
+const newCustomer = ref({ name: '', phone: '' });
+const selectedCustomer = ref(null);
+
+// ------------------------Search Customer----------------------------------------------
+async function searchCustomer() {
+  if (customerQuery.value.length < 2) {
+    filteredCustomers.value = [];
+    showSuggestions.value = false;
+    return;
   }
-  
-  const removeItem = (index) => {
-    invoice.value.items.splice(index, 1)
+
+  try {
+    const res = await fetch(`http://localhost:8080/api/customers/search?keyword=${encodeURIComponent(customerQuery.value)}`);
+    if (!res.ok) throw new Error('Network error');
+    const data = await res.json();
+    filteredCustomers.value = data;
+    showSuggestions.value = true;
+  } catch (error) {
+    console.error('Customer search failed:', error);
+    filteredCustomers.value = [];
+    showSuggestions.value = false;
   }
-  
-  const calculateItemTotal = (item) => {
-    const subtotal = item.quantity * item.unitPrice
-    const gst = (subtotal * item.gstPercentage) / 100
-    const discount = item.discount || 0
-    return subtotal + gst - discount
+}
+
+// Select existing customer
+function selectCustomer(customer) {
+  selectedCustomer.value = customer;
+  customerQuery.value = `${customer.name} (${customer.phone})`;
+  showSuggestions.value = false;
+
+  // Optional: set this into your invoice object
+  invoice.customer = customer;
+}
+
+// Save new customer
+async function saveCustomer() {
+  try {
+    const res = await fetch('http://localhost:8080/api/customers', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newCustomer.value),
+    });
+    if (!res.ok) throw new Error('Failed to save customer');
+    const saved = await res.json();
+
+    selectedCustomer.value = saved;
+    customerQuery.value = `${saved.name} (${saved.phone})`;
+    invoice.customer = saved; // assign to invoice
+
+    newCustomer.value = { name: '', phone: '' };
+    showCustomerModal.value = false;
+    showSuggestions.value = false;
+  } catch (error) {
+    console.error('Save customer failed:', error);
   }
-  
-  const totalGST = computed(() =>
-    invoice.value.items.reduce((sum, item) => {
-      const gst = (item.quantity * item.unitPrice * item.gstPercentage) / 100
-      return sum + gst
-    }, 0)
-  )
-  
-  const grandTotal = computed(() => {
-    const total = invoice.value.items.reduce((sum, item) => {
-      return sum + calculateItemTotal(item)
-    }, 0)
-    return total - (invoice.value.discount || 0)
-  })
-  
-  // Fetch customers and products
-  onMounted(async () => {
-    customers.value = (await axios.get('http://localhost:8080/api/customers/listAll')).data
-    products.value = (await axios.get('http://localhost:8082/api/products')).data
-  })
-  
-  // Submit to backend
-  const submitInvoice = async () => {
-    const payload = {
-      ...invoice.value,
-      totalGST: totalGST.value,
-      grandTotal: grandTotal.value
-    }
-  
-    try {
-      await axios.post('http://localhost:8083/api/salesinvoices', payload)
-      alert('Invoice saved successfully!')
-      invoice.value = {
-        customer: { id: '' },
-        invoiceDate: new Date().toISOString().substring(0, 10),
-        discount: 0,
-        items: []
-      }
-    } catch (err) {
-      console.error(err)
-      alert('Error saving invoice!')
-    }
-  }
-  
-  </script>
-  
-  <style scoped>
-  table, th, td {
-    border-collapse: collapse;
-  }
-  </style>
-  
+}
+
+//----------------------------------------------- Invoice Date ------------------
+import Datepicker from '@vuepic/vue-datepicker'
+import '@vuepic/vue-datepicker/dist/main.css'
+const formattedDate = new Date(invoice.value.invoiceDate).toISOString().split('T')[0];
+
+
+</script>
