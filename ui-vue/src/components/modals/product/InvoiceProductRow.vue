@@ -38,6 +38,12 @@
     <td>₹{{ itemTotal.toFixed(2) }}</td>
     <td><button @click="$emit('remove')" class="text-red-500 hover:text-red-700 text-sm">🗑</button></td>
   </tr>
+  <!-- Add Row Button -->
+<div class="flex justify-end mt-2 mb-4">
+  <button @click="addRow" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">
+    ➕ Add Row
+  </button>
+</div>
 </template>
 
 <script setup>
@@ -46,7 +52,7 @@ import { searchProducts, searchProductByBarcode } from '../../../services/salesI
 import { BrowserMultiFormatReader } from '@zxing/browser'
 
 const codeReader = new BrowserMultiFormatReader()
-const videoInputDevices = ref([])
+// const videoInputDevices = ref([])
 const selectedDeviceId = ref(null)
 const scanning = ref(false)
 
@@ -178,11 +184,26 @@ const stopBarcodeScanner = () => {
   }
 }
 
-
+// ---------------------------------------- Add new line manually ---------------------------
+const addRow = () => {
+  items.value.push({ qty: 1, price: 0, gst: 0, discount: 0 })
+}
 </script>
 
 <style scoped>
 .input-sm {
   @apply border border-gray-300 p-1 rounded text-sm;
+}
+table {
+  @apply text-sm border-collapse;
+}
+th, td {
+  @apply border px-3 py-2;
+}
+thead {
+  @apply bg-blue-100;
+}
+tbody tr:nth-child(even) {
+  @apply bg-gray-50;
 }
 </style>

@@ -35,9 +35,19 @@ const API_CUSTOMER_URL = 'http://localhost:8080/api/customers'
     return await res.json()
   }
 
-  export const saveSalesInvoice = async (invoice) => {
-    let invoices = JSON.parse(localStorage.getItem('invoices')) || []
-    invoices.push(invoice)
-    localStorage.setItem('invoices', JSON.stringify(invoices))
+  // export const saveSalesInvoice = async (invoice) => {
+  //   let invoices = JSON.parse(localStorage.getItem('invoices')) || []
+  //   invoices.push(invoice)
+  //   localStorage.setItem('invoices', JSON.stringify(invoices))
+  // }
+  export async function saveSalesInvoice(invoice) {
+    const res = await fetch('http://localhost:8083/api/salesinvoices', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(invoice),
+    })
+    if (!res.ok) {
+      throw new Error('Failed to save invoice')
+    }
+    return await res.json()
   }
-  

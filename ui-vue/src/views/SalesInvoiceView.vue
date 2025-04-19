@@ -246,11 +246,48 @@ const change = computed(() =>
 
 const roundedTotal = computed(() => Math.ceil(grandTotal.value));
 
-// Save invoice
+// -------------------------------------------- Reset ----------------------------------
+function resetForm() {
+  invoice.value = {
+    date: new Date().toISOString().slice(0, 10),
+    invoiceNumber: 'INV-' + Date.now(),
+    customerId: '',
+    items: [],
+    discount: 0,
+    paymentMode: 'Cash',
+    amountReceived: 0
+  }
+  customerQuery.value = ''
+  selectedCustomer.value = null
+  items.value = [{ qty: 1, price: 0, gst: 0, discount: 0 }]
+}
+// -------------------------------------------- Save invoice ----------------------------
 function saveInvoice() {
-  saveSalesInvoice(invoice.value).then(() => {
-    alert('Invoice Saved!')
-  })
+  if (!invoice.value.customerId) {
+    alert('Select a customer before saving.')
+    return
+  }
+  if (!invoice.value.items.length) {
+    alert('Add at least one product row.')
+    return
+  }
+
+  // Validate all items
+  for (const item of invoice.value.items) {
+    if (!item.productId || item.qty <= 0) {
+      alert('Check all product entries. Missing product or invalid quantity.')
+      return
+    }
+  }
+
+  console.log('Saving Invoice:', JSON.stringify(invoice.value, null, 2)) // <-- add this
+  saveSalesInvoice(invoice.value)
+    .then(() => {
+      alert('Invoice Saved!')
+    })
+    .catch(err => {
+      console.error('Save failed:', err)
+    })
 }
 </script>
 
