@@ -5,7 +5,7 @@ import ProductView from './views/ProductView.vue'
 import SalesInvoiceView from './views/SalesInvoiceView.vue'
 
 const routes = [
-  { path: '/', redirect: '/customers' },
+  { path: '/', redirect: '/admin' },
   { path: '/customers', component: CustomerGrid },
   { path: '/vendors', component: VendorGrid },
   { path: '/products', component: ProductView },

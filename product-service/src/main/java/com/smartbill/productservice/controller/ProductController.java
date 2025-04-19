@@ -1,7 +1,6 @@
 package com.smartbill.productservice.controller;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -12,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.smartbill.productservice.model.Brand;
@@ -56,6 +56,7 @@ public class ProductController {
     @Autowired private GroupRepository groupRepository;
     @Autowired private GenericProductRepository genericProductRepository;
     @Autowired private TaxRepository taxRepository;
+//    @Autowired private ProductService productService;
 
     // ========== Product CRUD ==========
 
@@ -87,6 +88,11 @@ public class ProductController {
     @GetMapping("/{id}")
     public Product getProductById(@PathVariable Integer id) {
         return productRepository.findById(id).orElse(null);
+    }
+
+    @GetMapping("/products/search")
+    public List<Product> searchProducts(@RequestParam String keyword) {
+        return productRepository.findByNameContainingIgnoreCaseOrProductCodeContainingIgnoreCase(keyword, keyword);
     }
 
     // ========== Related Entities ==========

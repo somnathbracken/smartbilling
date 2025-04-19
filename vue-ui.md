@@ -14,4 +14,5 @@ npx tailwindcss init -p
 npm install vue-router@4
 npm install -D tailwindcss postcss autoprefixer
 npm install lucide-vue-next
+npm install html2pdf.js
 npm run dev
