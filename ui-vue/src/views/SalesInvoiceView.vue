@@ -1,79 +1,173 @@
 <template>
-<!-- Customer Search Section -->
-<div class="mb-4 w-full">
-  <label class="block font-semibold mb-1">Customer</label>
-  <div class="relative w-full">
-    <input
-      v-model="customerQuery"
-      @input="searchCustomer"
-      placeholder="Search Customer by Name or Phone"
-      class="border p-2 w-full rounded"
-    />
-    <!-- Customer Suggestions -->
-    <ul v-if="showSuggestions && filteredCustomers.length" class="absolute z-10 bg-white border w-full max-h-48 overflow-y-auto">
-      <li
-        v-for="(customer, index) in filteredCustomers"
-        :key="index"
-        @click="selectCustomer(customer)"
-        class="p-2 hover:bg-blue-100 cursor-pointer"
-      >
-        {{ customer.name }} - {{ customer.phone }}
-      </li>
-    </ul>
+  <div class="p-6">
+    <h2 class="text-2xl font-bold mb-4">Sales Invoice</h2>
 
-    <!-- Add new customer if not found -->
-    <div v-if="showSuggestions && !filteredCustomers.length" class="absolute z-10 bg-white border w-full">
-      <div class="p-2 text-gray-500">
-        No match found.
-        <button @click="showCustomerModal = true" class="ml-2 text-blue-600 underline">Add New</button>
+    <!-- Invoice Header -->
+    <div class="grid grid-cols-2 gap-4 mb-4">
+      <div>
+        <label>Date:</label>
+        <input type="date" v-model="invoice.date" class="input" />
+      </div>
+      <div>
+        <label>Invoice No:</label>
+        <input type="text" v-model="invoice.invoiceNumber" class="input" readonly />
+      </div>
+      <!-- Customer Search Section -->
+      <div class="mb-4 w-full">
+        <label class="block font-semibold mb-1">Customer</label>
+        <div class="relative w-full">
+          <input
+            v-model="customerQuery"
+            @input="searchCustomer"
+            placeholder="Search Customer by Name or Phone"
+            class="border p-2 w-full rounded"
+          />
+          <!-- Customer Suggestions -->
+          <ul v-if="showSuggestions && filteredCustomers.length" class="absolute z-10 bg-white border w-full max-h-48 overflow-y-auto">
+            <li
+              v-for="(customer, index) in filteredCustomers"
+              :key="index"
+              @click="selectCustomer(customer)"
+              class="p-2 hover:bg-blue-100 cursor-pointer"
+            >
+              {{ customer.name }} - {{ customer.phone }}
+            </li>
+          </ul>
+
+          <!-- Add new customer if not found -->
+          <div v-if="showSuggestions && !filteredCustomers.length" class="absolute z-10 bg-white border w-full">
+            <div class="p-2 text-gray-500">
+              No match found.
+              <button @click="showCustomerModal = true" class="ml-2 text-blue-600 underline">Add New</button>
+            </div>
+          </div>
+        </div>
+      </div>
+</div>
+    <!-- Product Table -->
+    <table class="table-auto w-full mb-4 border">
+      <thead class="bg-gray-100">
+        <tr>
+          <th>Product</th>
+          <th>Qty</th>
+          <th>Price</th>
+          <th>GST %</th>
+          <th>Total</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <InvoiceProductRow
+          v-for="(item, index) in invoice.items"
+          :key="index"
+          :item="item"
+          @remove="removeItem(index)"
+        />
+      </tbody>
+    </table>
+    <button @click="addItem" class="btn btn-sm bg-blue-500 text-white">+ Add Product</button>
+
+    <!-- Summary -->
+    <div class="grid grid-cols-2 gap-4 my-4">
+      <div></div>
+      <div class="bg-gray-100 p-4 rounded shadow">
+        <p>Subtotal: ₹{{ subtotal }}</p>
+        <p>GST: ₹{{ gstTotal }}</p>
+        <p>Discount: ₹<input type="number" v-model="invoice.discount" class="w-20 input-sm" /></p>
+        <hr class="my-2" />
+        <p class="font-bold">Total: ₹{{ grandTotal }}</p>
       </div>
     </div>
-  </div>
-</div>
 
-<!-- Add Customer Modal -->
-<div v-if="showCustomerModal" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-  <div class="bg-white p-6 rounded shadow-lg w-96">
-    <h3 class="text-lg font-bold mb-4">Add New Customer</h3>
-    <input v-model="newCustomer.name" placeholder="Customer Name" class="border p-2 w-full mb-2" />
-    <input v-model="newCustomer.phone" placeholder="Phone Number" class="border p-2 w-full mb-2" />
-    <div class="flex justify-end mt-4">
-      <button @click="saveCustomer" class="bg-blue-600 text-white px-4 py-2 rounded mr-2">Save</button>
-      <button @click="showCustomerModal = false" class="bg-gray-400 text-white px-4 py-2 rounded">Cancel</button>
+    <!-- Payment -->
+    <div class="grid grid-cols-2 gap-4 mb-4">
+      <div>
+        <label>Payment Mode:</label>
+        <select v-model="invoice.paymentMode" class="input">
+          <option>Cash</option>
+          <option>Card</option>
+          <option>UPI</option>
+        </select>
+      </div>
+      <div>
+        <label>Amount Received:</label>
+        <input type="number" v-model="invoice.amountReceived" class="input" />
+        <p class="text-green-600 mt-1">Change: ₹{{ change }}</p>
+      </div>
     </div>
-  </div>
-</div>
-<!-- Invoice Date -->
-<div class="mb-4 w-full sm:w-1/2">
-  <label class="block font-semibold mb-1">Invoice Date</label>
-  <Datepicker
-    v-model="invoice.invoiceDate"
-    :format="'yyyy-MM-dd'"
-    :enable-time-picker="false"
-    :clearable="false"
-    class="w-full"
-  />
-</div>
 
+    <!-- Buttons -->
+    <div class="flex gap-4">
+      <button @click="saveInvoice" class="btn bg-green-500 text-white">Save</button>
+      <button class="btn bg-gray-300">Cancel</button>
+    </div>
+
+    <AddCustomerModal v-if="showCustomerModal" @close="showCustomerModal = false" @added="fetchCustomers" />
+  </div>
 </template>
+
 <script setup>
-import { ref } from 'vue';
+import { ref, computed, onMounted } from 'vue'
+import InvoiceProductRow from '../components/modals/product/InvoiceProductRow.vue'
+import AddCustomerModal from '../components/modals/product/AddCustomerModal.vue'
+import { fetchCustomers, saveSalesInvoice } from '../services/salesInvoiceService'
+
 const invoice = ref({
-  invoiceDate: new Date().toISOString().substring(0, 10), // default to today
-  customer: null,
-  invoiceDate: new Date(),
-  items: []
-});
+  date: new Date().toISOString().slice(0, 10),
+  invoiceNumber: 'INV-' + Date.now(),
+  customerId: '',
+  items: [],
+  discount: 0,
+  paymentMode: 'Cash',
+  amountReceived: 0
+})
+
+const customers = ref([])
+const showCustomerModal = ref(false)
+
+onMounted(fetchCustomersList)
+function fetchCustomersList() {
+  fetchCustomers().then(data => customers.value = data)
+}
+
+function addItem() {
+  invoice.value.items.push({ product: '', qty: 1, price: 0, gst: 0 })
+}
+
+function removeItem(index) {
+  invoice.value.items.splice(index, 1)
+}
+
+const subtotal = computed(() =>
+  invoice.value.items.reduce((sum, item) => sum + item.qty * item.price, 0)
+)
+const gstTotal = computed(() =>
+  invoice.value.items.reduce((sum, item) => sum + (item.qty * item.price * item.gst) / 100, 0)
+)
+const grandTotal = computed(() =>
+  subtotal.value + gstTotal.value - invoice.value.discount
+)
+const change = computed(() =>
+  invoice.value.amountReceived - grandTotal.value
+)
+
+function saveInvoice() {
+  saveSalesInvoice(invoice.value).then(() => {
+    alert('Invoice Saved!')
+    // reset or redirect
+  })
+}
+
+// ------------------------Search Customer----------------------------------------------
 // Reactive state
 const customerQuery = ref('');
 const filteredCustomers = ref([]);
 const showSuggestions = ref(false);
-const showCustomerModal = ref(false);
+// const showCustomerModal = ref(false);
 
 const newCustomer = ref({ name: '', phone: '' });
 const selectedCustomer = ref(null);
 
-// ------------------------Search Customer----------------------------------------------
 async function searchCustomer() {
   if (customerQuery.value.length < 2) {
     filteredCustomers.value = [];
@@ -126,11 +220,17 @@ async function saveCustomer() {
     console.error('Save customer failed:', error);
   }
 }
-
-//----------------------------------------------- Invoice Date ------------------
-import Datepicker from '@vuepic/vue-datepicker'
-import '@vuepic/vue-datepicker/dist/main.css'
-const formattedDate = new Date(invoice.value.invoiceDate).toISOString().split('T')[0];
-
-
+//-------------------------------------------- End of Search Customer -------------------------------------
 </script>
+
+<style scoped>
+.input {
+  @apply w-full border border-gray-300 p-2 rounded;
+}
+.input-sm {
+  @apply border border-gray-300 p-1 rounded;
+}
+.btn {
+  @apply px-4 py-2 rounded shadow;
+}
+</style>
