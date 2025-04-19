@@ -61,27 +61,29 @@
   </div>
 
     <!-- Product Table -->
-    <table class="table-auto w-full mb-4 border">
-      <thead class="bg-gray-100">
-        <tr>
-          <th>Product</th>
-          <th>Qty</th>
-          <th>Price</th>
-          <th>GST %</th>
-          <th>Discount %</th>
-          <th>Total</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        <InvoiceProductRow
-          v-for="(item, index) in invoice.items"
-          :key="index"
-          :item="item"
-          @remove="removeItem(index)"
-        />
-      </tbody>
-    </table>
+    <table class="table-fixed w-full border">
+    <thead>
+      <tr class="bg-gray-100 text-left text-sm">
+        <th>Product</th>
+        <th>Qty</th>
+        <th>Price</th>
+        <th>GST%</th>
+        <th>Disc%</th>
+        <th>Total</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <InvoiceProductRow
+        v-for="(item, index) in items"
+        :key="index"
+        :item="item"
+        @remove="removeRow(index)"
+        @focus-next="focusNextRow(index)"
+        :ref="el => rowRefs[index] = el"
+      />
+    </tbody>
+  </table>
     <button @click="addItem" class="btn btn-sm bg-blue-500 text-white">+ Add Product</button>
 
     <!-- Summary -->
@@ -295,6 +297,31 @@ const stopScanner = () => {
 
 onMounted(startScanner)
 onBeforeUnmount(stopScanner)
+
+import { nextTick } from 'vue'
+
+const items = ref([
+  { qty: 1, price: 0, gst: 0, discount: 0 }
+])
+
+const rowRefs = []
+
+const removeRow = (index) => {
+  items.value.splice(index, 1)
+}
+
+const focusNextRow = async (index) => {
+  if (index + 1 < items.value.length) {
+    await nextTick()
+    const nextInput = rowRefs[index + 1]?.$el.querySelector('input')
+    nextInput?.focus()
+  } else {
+    items.value.push({ qty: 1, price: 0, gst: 0, discount: 0 })
+    await nextTick()
+    const nextInput = rowRefs[index + 1]?.$el.querySelector('input')
+    nextInput?.focus()
+  }
+}
 
 </script>
 

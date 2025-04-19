@@ -4,13 +4,12 @@
       <input
         type="text"
         v-model="searchTerm"
-        @keyup.enter="handleBarcodeSearch"
+        @keydown.enter.prevent="handleBarcodeSearch"
         @focus="showSuggestions = true"
         @blur="hideSuggestionsWithDelay"
-        placeholder="Search or Scan Barcode"
+        placeholder="Search or Scan product"
         class="input-sm w-full"
       />
-      <!-- Suggestions Dropdown -->
       <ul
         v-if="showSuggestions && suggestions.length"
         class="absolute bg-white border w-full mt-1 max-h-40 overflow-y-auto z-10 shadow"
@@ -21,7 +20,7 @@
           @mousedown.prevent="selectProduct(product)"
           class="px-3 py-2 hover:bg-blue-100 cursor-pointer text-sm"
         >
-          {{ product.name }} ({{ product.productCode || product.code }})
+          {{ product.name }} ({{ product.productCode }})
         </li>
       </ul>
     </td>
@@ -34,75 +33,67 @@
   </tr>
 </template>
 
-
 <script setup>
 import { ref, watch, computed } from 'vue'
 import { searchProducts, searchProductByBarcode } from '../../../services/salesInvoiceService'
 
-const props = defineProps({ item: Object })
+const props = defineProps({
+  item: Object
+})
+const emit = defineEmits(['remove', 'focus-next'])
 
 const searchTerm = ref('')
 const suggestions = ref([])
 const showSuggestions = ref(false)
 let timeout = null
 
-// Search suggestion for manual entry
 const fetchSuggestions = async () => {
   if (searchTerm.value.length < 2) return
   suggestions.value = await searchProducts(searchTerm.value)
 }
 
-// Watch for dropdown suggestions
 watch(searchTerm, () => {
   clearTimeout(timeout)
   timeout = setTimeout(fetchSuggestions, 300)
 })
 
-// Handle dropdown selection
-const selectProduct = (product) => {
-  mapProductToItem(product)
-  searchTerm.value = product.name
-  showSuggestions.value = false
+const playBeep = () => {
+  const beep = new Audio('data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YQgAAAAA')
+  beep.play()
 }
 
-// Handle barcode scan via enter
 const handleBarcodeSearch = async () => {
   if (!searchTerm.value) return
   try {
     const result = await searchProductByBarcode(searchTerm.value)
     const product = Array.isArray(result) ? result[0] : result
     if (product) {
-      mapProductToItem(product)
-      searchTerm.value = product.name
+      selectProduct(product)
+      playBeep()
+      emit('focus-next')
     } else {
-      alert('No product found for barcode!')
+      alert('Product not found')
     }
-  } catch (error) {
-    console.error('Barcode lookup error:', error)
+  } catch (err) {
+    console.error('Barcode fetch error', err)
   }
+}
+
+const selectProduct = (product) => {
+  props.item.product = product.name
+  props.item.productId = product.id
+  props.item.price = parseFloat(product.unitPrice) || 0
+  props.item.gst = parseFloat(product.gstPercentage) || 0
+  props.item.discount = parseFloat(product.discounts?.replace('%', '') || 0)
+  props.item.qty = 1
+  searchTerm.value = product.name
   showSuggestions.value = false
 }
 
-// Hide suggestions after a blur delay
 const hideSuggestionsWithDelay = () => {
   setTimeout(() => showSuggestions.value = false, 200)
 }
 
-// Common mapping
-const mapProductToItem = (product) => {
-  props.item.product = product.name
-  props.item.productId = product.id
-  props.item.price = parseFloat(product.unitPrice || product.mrp || 0)
-  props.item.gst = parseFloat(product.gstPercentage || 0)
-  props.item.discount = parseFloat(
-    typeof product.discounts === 'string'
-      ? product.discounts.replace('%', '')
-      : product.discountPercentage || 0
-  )
-  props.item.qty = 1
-}
-
-// Line item total
 const itemTotal = computed(() => {
   const price = props.item.price || 0
   const qty = props.item.qty || 0
@@ -112,7 +103,6 @@ const itemTotal = computed(() => {
   total = total - (total * discount / 100)
   return total + (total * gst / 100)
 })
-
 </script>
 
 <style scoped>
