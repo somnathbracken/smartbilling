@@ -18,4 +18,5 @@ npm install html2pdf.js
 npm install vue3-date-time-picker
 npm install @vuepic/vue-datepicker
 npm install html5-qrcode
+npm install @zxing/browser
 npm run dev

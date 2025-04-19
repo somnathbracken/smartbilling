@@ -1,15 +1,30 @@
 <template>
   <tr class="relative">
     <td class="w-64">
-      <input
-        type="text"
-        v-model="searchTerm"
-        @keydown.enter.prevent="handleBarcodeSearch"
-        @focus="showSuggestions = true"
-        @blur="hideSuggestionsWithDelay"
-        placeholder="Search or Scan product"
-        class="input-sm w-full"
-      />
+      <div class="flex flex-col space-y-1">
+        <input
+          type="text"
+          v-model="searchTerm"
+          @keydown.enter.prevent="handleBarcodeSearch"
+          @focus="showSuggestions = true"
+          @blur="hideSuggestionsWithDelay"
+          placeholder="Search or Scan product"
+          class="input-sm w-full"
+        />
+        <button @click="startBarcodeScanner" class="text-xs text-blue-600 hover:underline self-start">
+          📷 Scan with Camera
+        </button>
+        <div v-if="showScanner" class="relative">
+          <video id="barcode-video" class="w-full border rounded"></video>
+          <button
+            @click="stopBarcodeScanner"
+            class="absolute top-1 right-1 bg-red-500 text-white px-2 py-1 text-xs rounded"
+          >
+            ✖ Close
+          </button>
+        </div>
+      </div>
+
       <ul
         v-if="showSuggestions && suggestions.length"
         class="absolute bg-white border w-full mt-1 max-h-40 overflow-y-auto z-10 shadow"
@@ -36,16 +51,18 @@
 <script setup>
 import { ref, watch, computed } from 'vue'
 import { searchProducts, searchProductByBarcode } from '../../../services/salesInvoiceService'
+import { BrowserMultiFormatReader } from '@zxing/browser'
 
-const props = defineProps({
-  item: Object
-})
+const props = defineProps({ item: Object })
 const emit = defineEmits(['remove', 'focus-next'])
 
 const searchTerm = ref('')
 const suggestions = ref([])
 const showSuggestions = ref(false)
 let timeout = null
+
+const showScanner = ref(false)
+let codeReader = null
 
 const fetchSuggestions = async () => {
   if (searchTerm.value.length < 2) return
@@ -56,11 +73,6 @@ watch(searchTerm, () => {
   clearTimeout(timeout)
   timeout = setTimeout(fetchSuggestions, 300)
 })
-
-const playBeep = () => {
-  const beep = new Audio('data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YQgAAAAA')
-  beep.play()
-}
 
 const handleBarcodeSearch = async () => {
   if (!searchTerm.value) return
@@ -90,6 +102,11 @@ const selectProduct = (product) => {
   showSuggestions.value = false
 }
 
+const playBeep = () => {
+  const beep = new Audio('data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YQgAAAAA')
+  beep.play()
+}
+
 const hideSuggestionsWithDelay = () => {
   setTimeout(() => showSuggestions.value = false, 200)
 }
@@ -103,6 +120,46 @@ const itemTotal = computed(() => {
   total = total - (total * discount / 100)
   return total + (total * gst / 100)
 })
+
+const startBarcodeScanner = async () => {
+  showScanner.value = true
+  try {
+    codeReader = new BrowserMultiFormatReader()
+    const devices = await BrowserMultiFormatReader.listVideoInputDevices()
+    const selectedDeviceId = devices[0]?.deviceId
+    if (!selectedDeviceId) {
+      alert('No camera found')
+      return
+    }
+    codeReader.decodeFromVideoDevice(
+      selectedDeviceId,
+      'barcode-video',
+      async (result, err) => {
+        if (result) {
+          console.log('Barcode scanned:', result.getText())
+          searchTerm.value = result.getText()
+          await handleBarcodeSearch()
+          stopBarcodeScanner()
+        } else if (err && !err.message.includes('No MultiFormat Readers')) {
+          console.error('QR Scan Error:', err)
+        }
+      }
+    )
+  } catch (e) {
+    console.error('Camera init failed', e)
+    alert('Camera failed to start')
+    showScanner.value = false
+  }
+}
+
+const stopBarcodeScanner = () => {
+  try {
+    codeReader?.reset()
+  } catch (e) {
+    console.warn('Scanner reset error:', e)
+  }
+  showScanner.value = false
+}
 </script>
 
 <style scoped>

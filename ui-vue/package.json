@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "@vuepic/vue-datepicker": "^11.0.2",
+    "@zxing/browser": "^0.1.5",
     "axios": "^1.8.4",
     "file-saver": "^2.0.5",
     "html2pdf.js": "^0.10.3",
