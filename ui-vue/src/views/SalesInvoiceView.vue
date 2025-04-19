@@ -45,21 +45,6 @@
       </div>
 </div>
 
-<!-- Add Barcode Product Scanning support -->
-  <div>
-    <div id="reader" style="width: 100%; max-width: 350px;"></div>
-    <button @click="stopScanner" class="mt-2 bg-red-500 text-white px-3 py-1 rounded text-sm">Stop Scanner</button>
-  </div>
-  <div class="mb-4">
-    <input
-      type="text"
-      v-model="barcode"
-      @keydown.enter.prevent="handleBarcodeScan"
-      placeholder="Scan barcode here..."
-      class="border p-2 rounded w-72 text-sm"
-    />
-  </div>
-
     <!-- Product Table -->
     <table class="table-fixed w-full border">
     <thead>
@@ -84,7 +69,6 @@
       />
     </tbody>
   </table>
-    <button @click="addItem" class="btn btn-sm bg-blue-500 text-white">+ Add Product</button>
 
     <!-- Summary -->
     <div class="grid grid-cols-2 gap-4 my-4">
@@ -241,62 +225,7 @@ async function saveCustomer() {
 }
 //-------------------------------------------- End of Search Customer -------------------------------------
 
-//--------------------------------------------- Bar code Support ------------------------------------------
-import { getProductByBarcode } from '../services/salesInvoiceService'
-
-const barcode = ref('')
-const invoiceItems = ref([]) // assuming you're managing invoice items here
-
-const handleBarcodeScan = async () => {
-  if (!barcode.value) return
-
-  const product = await getProductByBarcode(barcode.value.trim())
-  if (product) {
-    invoiceItems.value.push({
-      productId: product.id,
-      product: product.name,
-      qty: 1,
-      price: product.unitPrice,
-      gst: product.gstPercentage,
-      discount: product.discountPercentage || 0
-    })
-  } else {
-    alert('Product not found!')
-  }
-
-  barcode.value = ''
-}
-
-// Scanning support for mobile/webcam
-import { onBeforeUnmount } from 'vue'
-import { Html5Qrcode } from 'html5-qrcode'
-
-const emit = defineEmits(['onScan'])
-let html5QrCode
-
-const startScanner = async () => {
-  const config = { fps: 10, qrbox: { width: 250, height: 250 } }
-
-  html5QrCode = new Html5Qrcode("reader")
-  await html5QrCode.start(
-    { facingMode: "environment" }, // back camera
-    config,
-    (decodedText) => {
-      emit('onScan', decodedText)
-      stopScanner() // stop after successful scan
-    },
-    (errorMessage) => {
-      // console.log(`Scan error: ${errorMessage}`)
-    }
-  )
-}
-
-const stopScanner = () => {
-  if (html5QrCode) html5QrCode.stop().then(() => html5QrCode.clear())
-}
-
-onMounted(startScanner)
-onBeforeUnmount(stopScanner)
+//--------------------------------------------- Focusing Next Line ------------------------------------------
 
 import { nextTick } from 'vue'
 
