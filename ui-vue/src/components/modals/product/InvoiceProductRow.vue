@@ -1,28 +1,20 @@
 <template>
   <tr class="relative">
-    <td class="w-64">
-      <div class="flex flex-col space-y-1">
-        <input
-          type="text"
-          v-model="searchTerm"
-          @keydown.enter.prevent="handleBarcodeSearch"
-          @focus="showSuggestions = true"
-          @blur="hideSuggestionsWithDelay"
-          placeholder="Search or Scan product"
-          class="input-sm w-full"
-        />
-        <button @click="startBarcodeScanner" class="text-xs text-blue-600 hover:underline self-start">
-          📷 Scan with Camera
-        </button>
-        <div v-if="showScanner" class="relative">
-          <video id="barcode-video" class="w-full border rounded"></video>
-          <button
-            @click="stopBarcodeScanner"
-            class="absolute top-1 right-1 bg-red-500 text-white px-2 py-1 text-xs rounded"
-          >
-            ✖ Close
-          </button>
-        </div>
+    <td class="w-64 relative">
+      <input
+        type="text"
+        v-model="searchTerm"
+        @keydown.enter.prevent="handleBarcodeSearch"
+        @focus="showSuggestions = true"
+        @blur="hideSuggestionsWithDelay"
+        placeholder="Search or Scan product"
+        class="input-sm w-full"
+      />
+      <button @click="toggleScanner" class="text-blue-600 underline text-sm ml-2">📷 Scan Barcode</button>
+
+      <!-- Only show when scanner is active -->
+      <div v-if="showScanner" class="absolute bg-white border p-2 mt-1 z-20 shadow w-full">
+        <video id="video-preview" width="300" height="200" class="rounded border" autoplay></video>
       </div>
 
       <ul
@@ -53,6 +45,11 @@ import { ref, watch, computed } from 'vue'
 import { searchProducts, searchProductByBarcode } from '../../../services/salesInvoiceService'
 import { BrowserMultiFormatReader } from '@zxing/browser'
 
+const codeReader = new BrowserMultiFormatReader()
+const videoInputDevices = ref([])
+const selectedDeviceId = ref(null)
+const scanning = ref(false)
+
 const props = defineProps({ item: Object })
 const emit = defineEmits(['remove', 'focus-next'])
 
@@ -62,7 +59,7 @@ const showSuggestions = ref(false)
 let timeout = null
 
 const showScanner = ref(false)
-let codeReader = null
+// let codeReader = null
 
 const fetchSuggestions = async () => {
   if (searchTerm.value.length < 2) return
@@ -121,45 +118,67 @@ const itemTotal = computed(() => {
   return total + (total * gst / 100)
 })
 
+let activeControls = null
+
+const toggleScanner = () => {
+  if (showScanner.value) {
+    stopBarcodeScanner()
+  } else {
+    showScanner.value = true
+    startBarcodeScanner()
+  }
+}
+
 const startBarcodeScanner = async () => {
-  showScanner.value = true
   try {
-    codeReader = new BrowserMultiFormatReader()
     const devices = await BrowserMultiFormatReader.listVideoInputDevices()
-    const selectedDeviceId = devices[0]?.deviceId
-    if (!selectedDeviceId) {
-      alert('No camera found')
+    if (!devices.length) {
+      alert("No camera devices found")
       return
     }
-    codeReader.decodeFromVideoDevice(
-      selectedDeviceId,
-      'barcode-video',
-      async (result, err) => {
+
+    selectedDeviceId.value = devices[0].deviceId
+    scanning.value = true
+
+    activeControls = await codeReader.decodeFromVideoDevice(
+      selectedDeviceId.value,
+      'video-preview',
+      async (result, err, controls) => {
         if (result) {
-          console.log('Barcode scanned:', result.getText())
           searchTerm.value = result.getText()
           await handleBarcodeSearch()
           stopBarcodeScanner()
-        } else if (err && !err.message.includes('No MultiFormat Readers')) {
-          console.error('QR Scan Error:', err)
+        } else if (err && err.name !== 'NotFoundException') {
+          console.warn('QR Scan Error:', err)
         }
       }
     )
   } catch (e) {
-    console.error('Camera init failed', e)
-    alert('Camera failed to start')
-    showScanner.value = false
+    console.error('Camera start error:', e)
   }
 }
 
 const stopBarcodeScanner = () => {
-  try {
-    codeReader?.reset()
-  } catch (e) {
-    console.warn('Scanner reset error:', e)
+  if (scanning.value) {
+    try {
+      activeControls?.stop()
+    } catch (e) {
+      console.warn('Stopping controls failed:', e)
+    }
+
+    const videoEl = document.getElementById('video-preview')
+    if (videoEl?.srcObject) {
+      videoEl.srcObject.getTracks().forEach(track => track.stop())
+      videoEl.srcObject = null
+    }
+
+    scanning.value = false
+    showScanner.value = false
+    activeControls = null
   }
-  showScanner.value = false
 }
+
+
 </script>
 
 <style scoped>
