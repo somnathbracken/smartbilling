@@ -4,9 +4,10 @@
       <input
         type="text"
         v-model="searchTerm"
+        @keyup.enter="handleBarcodeSearch"
         @focus="showSuggestions = true"
         @blur="hideSuggestionsWithDelay"
-        placeholder="Search product"
+        placeholder="Search or Scan Barcode"
         class="input-sm w-full"
       />
       <!-- Suggestions Dropdown -->
@@ -20,7 +21,7 @@
           @mousedown.prevent="selectProduct(product)"
           class="px-3 py-2 hover:bg-blue-100 cursor-pointer text-sm"
         >
-          {{ product.name }} ({{ product.code }})
+          {{ product.name }} ({{ product.productCode || product.code }})
         </li>
       </ul>
     </td>
@@ -33,43 +34,75 @@
   </tr>
 </template>
 
+
 <script setup>
 import { ref, watch, computed } from 'vue'
-import { searchProducts } from '../../../services/salesInvoiceService'
+import { searchProducts, searchProductByBarcode } from '../../../services/salesInvoiceService'
 
-const props = defineProps({
-  item: Object
-})
+const props = defineProps({ item: Object })
 
 const searchTerm = ref('')
 const suggestions = ref([])
 const showSuggestions = ref(false)
 let timeout = null
 
+// Search suggestion for manual entry
 const fetchSuggestions = async () => {
   if (searchTerm.value.length < 2) return
   suggestions.value = await searchProducts(searchTerm.value)
 }
 
+// Watch for dropdown suggestions
 watch(searchTerm, () => {
   clearTimeout(timeout)
   timeout = setTimeout(fetchSuggestions, 300)
 })
 
+// Handle dropdown selection
 const selectProduct = (product) => {
-  props.item.product = product.name
-  props.item.productId = product.id
-  props.item.price = product.unitPrice
-  props.item.gst = product.gstPercentage
-  props.item.discount = product.discountPercentage || 0
+  mapProductToItem(product)
   searchTerm.value = product.name
   showSuggestions.value = false
 }
 
+// Handle barcode scan via enter
+const handleBarcodeSearch = async () => {
+  if (!searchTerm.value) return
+  try {
+    const result = await searchProductByBarcode(searchTerm.value)
+    const product = Array.isArray(result) ? result[0] : result
+    if (product) {
+      mapProductToItem(product)
+      searchTerm.value = product.name
+    } else {
+      alert('No product found for barcode!')
+    }
+  } catch (error) {
+    console.error('Barcode lookup error:', error)
+  }
+  showSuggestions.value = false
+}
+
+// Hide suggestions after a blur delay
 const hideSuggestionsWithDelay = () => {
   setTimeout(() => showSuggestions.value = false, 200)
 }
 
+// Common mapping
+const mapProductToItem = (product) => {
+  props.item.product = product.name
+  props.item.productId = product.id
+  props.item.price = parseFloat(product.unitPrice || product.mrp || 0)
+  props.item.gst = parseFloat(product.gstPercentage || 0)
+  props.item.discount = parseFloat(
+    typeof product.discounts === 'string'
+      ? product.discounts.replace('%', '')
+      : product.discountPercentage || 0
+  )
+  props.item.qty = 1
+}
+
+// Line item total
 const itemTotal = computed(() => {
   const price = props.item.price || 0
   const qty = props.item.qty || 0
@@ -79,8 +112,6 @@ const itemTotal = computed(() => {
   total = total - (total * discount / 100)
   return total + (total * gst / 100)
 })
-
-// Add product in row items
 
 </script>
 
