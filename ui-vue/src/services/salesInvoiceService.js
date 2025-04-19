@@ -18,7 +18,14 @@ const API_CUSTOMER_URL = 'http://localhost:8080/api/customers'
     if (!response.ok) return []
     return await response.json()
   }
-  
+
+  export const getProductByBarcode = async (barcode) => {
+    //const response = await fetch(`${ API_PRODUCT_URL }/api/products/barcode/${barcode}`)
+    const response = await fetch(`${ API_PRODUCT_URL }/search?keyword=${encodeURIComponent(barcode)}`)
+    if (!response.ok) return null
+    return await response.json()
+  }
+
   export const saveSalesInvoice = async (invoice) => {
     let invoices = JSON.parse(localStorage.getItem('invoices')) || []
     invoices.push(invoice)

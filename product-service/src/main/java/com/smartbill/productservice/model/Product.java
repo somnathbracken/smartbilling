@@ -17,7 +17,9 @@ public class Product {
 
     //@Column(name = "product_code")
     private String productCode;
-
+    
+    private String barCode;
+    
     private String hsnCode;
     
     private String hsnDescription;
@@ -103,7 +105,14 @@ public class Product {
 	}
 
 	
-	
+	public String getBarCode() {
+		return barCode;
+	}
+
+	public void setBarCode(String barCode) {
+		this.barCode = barCode;
+	}
+
 	public String getDiscounts() {
 		return discounts;
 	}

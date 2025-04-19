@@ -92,7 +92,7 @@ public class ProductController {
 
     @GetMapping("/products/search")
     public List<Product> searchProducts(@RequestParam String keyword) {
-        return productRepository.findByNameContainingIgnoreCaseOrProductCodeContainingIgnoreCase(keyword, keyword);
+        return productRepository.findByNameContainingIgnoreCaseOrProductCodeContainingIgnoreCaseOrBarCodeContainingIgnoreCase(keyword, keyword, keyword);
     }
 
     // ========== Related Entities ==========

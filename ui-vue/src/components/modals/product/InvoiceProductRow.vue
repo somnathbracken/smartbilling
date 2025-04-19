@@ -79,6 +79,9 @@ const itemTotal = computed(() => {
   total = total - (total * discount / 100)
   return total + (total * gst / 100)
 })
+
+// Add product in row items
+
 </script>
 
 <style scoped>
